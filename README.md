@@ -94,6 +94,14 @@ That writes:
 - `data/exports/funny-top-5.plan.json`
 - `data/exports/funny-top-5.render.ps1`
 
+You can also include local intro/outro clips and let the renderer temporarily fetch approved direct-media clips:
+
+```powershell
+clipbot plan --style top5 --count 5 --name funny-top-5 --intro "C:\clips\intro.mp4" --outro "C:\clips\outro.mp4" --download-approved
+```
+
+The planner keeps the whole compilation within `45s`, including intro and outro.
+
 ### 5. Render with FFmpeg
 
 ```powershell
@@ -101,6 +109,8 @@ clipbot render --plan data/exports/funny-top-5.plan.json --execute
 ```
 
 If FFmpeg is not installed, the generated PowerShell render script is still useful as a handoff.
+
+When `--download-approved` is used, approved remote clips are downloaded into a temporary folder inside the build directory and deleted automatically after the render finishes.
 
 ### 6. Upload to YouTube
 
@@ -130,5 +140,6 @@ Recommended approval notes:
 - Reddit discovery is metadata-only and best used to surface clips for manual review.
 - YouTube discovery is metadata-only and can be filtered to Creative Commons via config.
 - The generated FFmpeg script normalizes clips to `1080x1920`, `30fps`, and AAC audio.
+- Auto-download during render is limited to direct media URLs for approved clips and does not support generic YouTube scraping.
 - The uploader defaults to `private` unless the plan says otherwise.
 - New or unaudited YouTube API projects may have private-only upload restrictions.

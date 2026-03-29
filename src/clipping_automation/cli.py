@@ -62,6 +62,13 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("--count", type=int, default=5)
     plan.add_argument("--name", help="Output name without extension.")
     plan.add_argument("--max-clip-duration", type=int, default=18)
+    plan.add_argument("--intro", type=Path, help="Local intro clip to prepend.")
+    plan.add_argument("--outro", type=Path, help="Local outro clip to append.")
+    plan.add_argument(
+        "--download-approved",
+        action="store_true",
+        help="Temporarily download approved clips that have direct remote media URLs.",
+    )
 
     render = subparsers.add_parser("render", help="Show or execute the generated FFmpeg render script.")
     render.add_argument("--plan", type=Path, required=True)
@@ -140,10 +147,14 @@ def main(argv: list[str] | None = None) -> int:
             count=args.count,
             name=args.name,
             max_clip_duration=args.max_clip_duration,
+            intro_path=args.intro,
+            outro_path=args.outro,
+            allow_remote_media=args.download_approved,
         )
         print(f"Plan: {plan['render']['plan_path']}")
         print(f"Render script: {plan['render']['render_script_path']}")
         print(f"Output video: {plan['render']['output_video_path']}")
+        print(f"Planned duration: {plan['render']['planned_total_duration_seconds']}s / 45s")
         return 0
 
     if args.command == "render":
@@ -152,6 +163,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Render script: {result['render_script_path']}")
         if result["executed"]:
             print(f"Rendered video: {result['output_video_path']}")
+            print("Temporary downloaded clips were cleaned up after render.")
         else:
             print("Render script ready. Re-run with --execute after installing FFmpeg.")
         return 0

@@ -124,6 +124,7 @@ def fetch_candidates(
     source_type: str | None = None,
     rights_status: str | None = None,
     local_only: bool = False,
+    usable_only: bool = False,
 ) -> list[sqlite3.Row]:
     clauses: list[str] = []
     params: list[object] = []
@@ -136,6 +137,8 @@ def fetch_candidates(
         params.append(rights_status)
     if local_only:
         clauses.append("local_media_path IS NOT NULL")
+    if usable_only:
+        clauses.append("(local_media_path IS NOT NULL OR media_url IS NOT NULL)")
 
     where_clause = " WHERE " + " AND ".join(clauses) if clauses else ""
     params.append(limit)
