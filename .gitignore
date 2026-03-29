@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+
+config/sources.toml
+client_secret*.json
+token*.json
+
+data/state/*.db
+data/state/*.json
+data/exports/*.mp4
+data/exports/*_build/
