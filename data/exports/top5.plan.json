@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-03-29T15:43:01.408438+00:00",
+  "generated_at": "2026-03-29T16:36:46.658471+00:00",
   "style": "top5",
-  "name": "top5-2026-03-29",
+  "name": "top5",
   "clips": [
     {
       "rank": 1,
@@ -77,10 +77,10 @@
       "height": 1920,
       "fps": 30
     },
-    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-29_build",
-    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-29.plan.json",
-    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-29.render.ps1",
-    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-29.mp4",
+    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5_build",
+    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.plan.json",
+    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.render.ps1",
+    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.mp4",
     "download_remote_media": true,
     "cleanup_downloads_after_render": true,
     "max_total_duration_seconds": 45,

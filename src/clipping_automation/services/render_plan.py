@@ -85,6 +85,13 @@ def _render_script_contents(plan: dict) -> str:
     output_path = plan["render"]["output_video_path"]
     lines = [
         "$ErrorActionPreference = 'Stop'",
+        "function Invoke-CheckedCommand {",
+        "  param([scriptblock]$Command)",
+        "  & $Command",
+        "  if ($LASTEXITCODE -ne 0) {",
+        "    throw \"External command failed with exit code $LASTEXITCODE\"",
+        "  }",
+        "}",
         f"$buildDir = {ps_quote(str(build_dir))}",
         "New-Item -ItemType Directory -Force -Path $buildDir | Out-Null",
         "$clips = @(",
@@ -128,14 +135,14 @@ def _render_script_contents(plan: dict) -> str:
         [
             "",
             "foreach ($clip in $clips) {",
-            '  & ffmpeg -y -i $clip.Input -t $clip.Duration -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -af "loudnorm=I=-16:LRA=11:TP=-1.5" -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k $clip.Output',
+            '  Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -t $clip.Duration -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -af "loudnorm=I=-16:LRA=11:TP=-1.5" -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k $clip.Output }',
             "}",
             "",
             "$concatLines = $clips | ForEach-Object {",
             "  \"file '$($_.Output.Replace('\\', '/'))'\"",
             "}",
-            f"Set-Content -Path {ps_quote(str(concat_file))} -Value $concatLines -Encoding utf8",
-            f"& ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -c copy {ps_quote(output_path)}",
+            f"[System.IO.File]::WriteAllLines({ps_quote(str(concat_file))}, $concatLines, [System.Text.UTF8Encoding]::new($false))",
+            f"Invoke-CheckedCommand {{ ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -c copy {ps_quote(output_path)} }}",
         ]
     )
     return "\n".join(lines) + "\n"
