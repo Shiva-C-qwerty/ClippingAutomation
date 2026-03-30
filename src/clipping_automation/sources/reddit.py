@@ -37,6 +37,7 @@ def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
         or {}
     )
     media_url = reddit_video.get("fallback_url") or post.get("url_overridden_by_dest") or post.get("url")
+    dash_url = reddit_video.get("dash_url")
     duration_seconds = reddit_video.get("duration")
     license_hint = "Manual permission required from original creator"
 
@@ -84,6 +85,7 @@ def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
             "is_video": post.get("is_video"),
             "subreddit": post.get("subreddit"),
             "url": post.get("url"),
+            "dash_url": dash_url,
         },
     }
 

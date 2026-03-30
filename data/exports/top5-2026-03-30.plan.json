@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-03-29T16:36:46.658471+00:00",
+  "generated_at": "2026-03-30T01:13:10.473478+00:00",
   "style": "top5",
-  "name": "top5",
+  "name": "top5-2026-03-30",
   "clips": [
     {
       "rank": 1,
@@ -13,6 +13,14 @@
       "score": 76.67,
       "local_media_path": null,
       "media_url": "https://v.redd.it/n0smk8fs9prg1/CMAF_1080.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.95,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "funny",
+        "url": "https://v.redd.it/n0smk8fs9prg1"
+      },
       "clip_duration_seconds": 9,
       "rights_notes": null
     },
@@ -26,6 +34,14 @@
       "score": 72.77,
       "local_media_path": null,
       "media_url": "https://v.redd.it/khr3owq9amqg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.97,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "funny",
+        "url": "https://v.redd.it/khr3owq9amqg1"
+      },
       "clip_duration_seconds": 9,
       "rights_notes": null
     },
@@ -39,6 +55,14 @@
       "score": 72.57,
       "local_media_path": null,
       "media_url": "https://v.redd.it/7spaamftrlrg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.97,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "ContagiousLaughter",
+        "url": "https://v.redd.it/7spaamftrlrg1"
+      },
       "clip_duration_seconds": 9,
       "rights_notes": null
     },
@@ -52,6 +76,14 @@
       "score": 62.75,
       "local_media_path": null,
       "media_url": "https://v.redd.it/wthn7mje8ing1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "ContagiousLaughter",
+        "url": "https://v.redd.it/wthn7mje8ing1"
+      },
       "clip_duration_seconds": 9,
       "rights_notes": null
     },
@@ -65,6 +97,14 @@
       "score": 59.41,
       "local_media_path": null,
       "media_url": "https://v.redd.it/5831cwoz9yng1/CMAF_480.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.97,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "WatchPeopleDieInside",
+        "url": "https://v.redd.it/5831cwoz9yng1"
+      },
       "clip_duration_seconds": 9,
       "rights_notes": null
     }
@@ -77,17 +117,17 @@
       "height": 1920,
       "fps": 30
     },
-    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5_build",
-    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.plan.json",
-    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.render.ps1",
-    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5.mp4",
+    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-30_build",
+    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-30.plan.json",
+    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-30.render.ps1",
+    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top5-2026-03-30.mp4",
     "download_remote_media": true,
     "cleanup_downloads_after_render": true,
     "max_total_duration_seconds": 45,
     "planned_total_duration_seconds": 45
   },
   "youtube": {
-    "title": "Top 5 Funny Clips | 2026-03-29 #shorts",
+    "title": "Top 5 Funny Clips | 2026-03-30 #shorts",
     "description": "Compilation generated with ClippingAutomation MVP.\nOnly upload this if you have the rights to reuse every clip.\n\nSources:\n1. Bro's laughing with his soul - https://www.reddit.com/r/funny/comments/1s5oqdo/bros_laughing_with_his_soul/\n2. Cat Slam! - https://www.reddit.com/r/funny/comments/1s0oxsw/cat_slam/\n3. Trick with cigarette - https://www.reddit.com/r/ContagiousLaughter/comments/1s56o6x/trick_with_cigarette/\n4. The girls laugh - https://www.reddit.com/r/ContagiousLaughter/comments/1rmswf5/the_girls_laugh/\n5. So thats why my package was delayed! - https://www.reddit.com/r/WatchPeopleDieInside/comments/1roqzal/so_thats_why_my_package_was_delayed/",
     "tags": [
       "funny",

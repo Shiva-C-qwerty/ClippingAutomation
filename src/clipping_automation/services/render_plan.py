@@ -13,6 +13,7 @@ from clipping_automation.services.media import (
     create_temp_download_dir,
     downloadable_media_url,
     download_media,
+    download_reddit_media,
 )
 from clipping_automation.utils import ensure_directory, ps_quote, slugify
 
@@ -92,6 +93,14 @@ def _render_script_contents(plan: dict) -> str:
         "    throw \"External command failed with exit code $LASTEXITCODE\"",
         "  }",
         "}",
+        "function Test-HasAudio {",
+        "  param([string]$InputPath)",
+        "  $audioProbe = & ffprobe -v error -select_streams a:0 -show_entries stream=index -of csv=p=0 $InputPath",
+        "  if ($LASTEXITCODE -ne 0) {",
+        "    throw \"ffprobe failed while checking audio for $InputPath\"",
+        "  }",
+        "  return -not [string]::IsNullOrWhiteSpace(($audioProbe | Out-String).Trim())",
+        "}",
         f"$buildDir = {ps_quote(str(build_dir))}",
         "New-Item -ItemType Directory -Force -Path $buildDir | Out-Null",
         "$clips = @(",
@@ -135,14 +144,18 @@ def _render_script_contents(plan: dict) -> str:
         [
             "",
             "foreach ($clip in $clips) {",
-            '  Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -t $clip.Duration -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -af "loudnorm=I=-16:LRA=11:TP=-1.5" -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 192k $clip.Output }',
+            "  if (Test-HasAudio -InputPath $clip.Input) {",
+            '    Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -t $clip.Duration -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -af "loudnorm=I=-16:LRA=11:TP=-1.5" -map 0:v:0 -map 0:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }',
+            "  } else {",
+            '    Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -f lavfi -t $clip.Duration -i anullsrc=channel_layout=stereo:sample_rate=48000 -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -shortest -map 0:v:0 -map 1:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }',
+            "  }",
             "}",
             "",
             "$concatLines = $clips | ForEach-Object {",
             "  \"file '$($_.Output.Replace('\\', '/'))'\"",
             "}",
             f"[System.IO.File]::WriteAllLines({ps_quote(str(concat_file))}, $concatLines, [System.Text.UTF8Encoding]::new($false))",
-            f"Invoke-CheckedCommand {{ ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -c copy {ps_quote(output_path)} }}",
+            f"Invoke-CheckedCommand {{ ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -vf format=yuv420p -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -ar 48000 -b:a 192k -movflags +faststart {ps_quote(output_path)} }}",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -159,6 +172,13 @@ def _usable_rows(conn, allow_remote_media: bool, count: int) -> list[dict]:
     usable: list[dict] = []
     for row in rows:
         item = dict(row)
+        if item.get("metadata_json"):
+            try:
+                item["metadata"] = json.loads(item["metadata_json"])
+            except json.JSONDecodeError:
+                item["metadata"] = {}
+        else:
+            item["metadata"] = {}
         if item.get("local_media_path"):
             usable.append(item)
         elif allow_remote_media and downloadable_media_url(item["source_type"], item.get("media_url")):
@@ -235,6 +255,7 @@ def create_compilation_plan(
                 "score": row["score"],
                 "local_media_path": row["local_media_path"],
                 "media_url": row["media_url"],
+                "metadata": row.get("metadata", {}),
                 "clip_duration_seconds": clip_duration,
                 "rights_notes": row["rights_notes"],
             }
@@ -306,7 +327,14 @@ def _resolve_clip_inputs(plan: dict) -> tuple[dict, Path | None]:
             if downloads_dir is None:
                 downloads_dir = create_temp_download_dir(build_dir)
             target_path = downloads_dir / f"{clip['rank']:02d}_{slugify(clip['title'])}.mp4"
-            download_media(media_url, target_path)
+            if clip["source_type"] == "reddit":
+                download_reddit_media(
+                    media_url=media_url,
+                    destination=target_path,
+                    dash_url=(clip.get("metadata") or {}).get("dash_url"),
+                )
+            else:
+                download_media(media_url, target_path)
             clip["resolved_input_path"] = str(target_path)
     except Exception:
         cleanup_temp_dir(downloads_dir)

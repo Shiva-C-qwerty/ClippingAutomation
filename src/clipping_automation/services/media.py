@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import subprocess
 import tempfile
 import urllib.parse
 from pathlib import Path
@@ -8,6 +9,30 @@ from pathlib import Path
 import requests
 
 from clipping_automation.utils import ensure_directory
+
+
+def derive_reddit_dash_url(media_url: str | None) -> str | None:
+    if not media_url:
+        return None
+    parsed = urllib.parse.urlparse(media_url)
+    if parsed.netloc.lower() != "v.redd.it":
+        return None
+
+    parts = [part for part in parsed.path.split("/") if part]
+    if len(parts) < 2:
+        return None
+
+    clip_id = parts[0]
+    return urllib.parse.urlunparse(
+        (
+            parsed.scheme or "https",
+            parsed.netloc,
+            f"/{clip_id}/DASHPlaylist.mpd",
+            "",
+            "",
+            "",
+        )
+    )
 
 
 def create_temp_download_dir(base_dir: Path) -> Path:
@@ -40,3 +65,35 @@ def download_media(url: str, destination: Path, timeout: int = 60) -> Path:
                 if chunk:
                     handle.write(chunk)
     return destination
+
+
+def download_reddit_media(
+    *,
+    media_url: str,
+    destination: Path,
+    dash_url: str | None = None,
+    timeout: int = 60,
+) -> Path:
+    ensure_directory(destination.parent)
+    effective_dash_url = dash_url or derive_reddit_dash_url(media_url)
+    if effective_dash_url:
+        try:
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    effective_dash_url,
+                    "-c",
+                    "copy",
+                    str(destination),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            return destination
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            pass
+
+    return download_media(media_url, destination, timeout=timeout)
