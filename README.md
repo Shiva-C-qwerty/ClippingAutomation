@@ -100,7 +100,7 @@ You can also include local intro/outro clips and let the renderer temporarily fe
 clipbot plan --style top5 --count 5 --name funny-top-5 --intro "C:\clips\intro.mp4" --outro "C:\clips\outro.mp4" --download-approved
 ```
 
-The planner keeps the whole compilation within `45s`, including intro and outro.
+The planner keeps the whole compilation within `180s`, including intro and outro.
 
 ### 5. Render with FFmpeg
 
@@ -119,6 +119,14 @@ clipbot upload --plan data/exports/funny-top-5.plan.json
 ```
 
 The first upload opens the OAuth consent flow in your browser and stores a token file locally.
+
+### 7. Archive clips after a finished compilation
+
+```powershell
+clipbot archive-plan --plan data/exports/funny-top-5.plan.json
+```
+
+That marks the clips from that plan as `archived` so future planning will not reuse them by default.
 
 ## Rights Workflow
 

@@ -17,7 +17,7 @@ from clipping_automation.services.media import (
 )
 from clipping_automation.utils import ensure_directory, ps_quote, slugify
 
-SHORTS_MAX_SECONDS = 45
+SHORTS_MAX_SECONDS = 180
 DEFAULT_INTRO_SECONDS = 3
 DEFAULT_OUTRO_SECONDS = 3
 
@@ -211,7 +211,7 @@ def create_compilation_plan(
     outro_seconds = _asset_duration(outro_path, DEFAULT_OUTRO_SECONDS)
     available_seconds = SHORTS_MAX_SECONDS - intro_seconds - outro_seconds
     if available_seconds <= 0:
-        raise ValueError("Intro/outro leave no room for clips inside the 45 second limit.")
+        raise ValueError("Intro/outro leave no room for clips inside the 180 second limit.")
 
     with connect(db_path) as conn:
         usable_rows = _usable_rows(conn, allow_remote_media=allow_remote_media, count=count)

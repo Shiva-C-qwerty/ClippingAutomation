@@ -6,6 +6,7 @@ from pathlib import Path
 from clipping_automation.config import DEFAULT_CONFIG_PATH, DEFAULT_DB_PATH, bootstrap_workspace
 from clipping_automation.db import connect, fetch_candidates, initialize_database
 from clipping_automation.services.approval import approve_candidate
+from clipping_automation.services.archive import archive_candidates_from_plan
 from clipping_automation.services.discovery import run_discovery
 from clipping_automation.services.render_plan import create_compilation_plan, run_render
 from clipping_automation.services.upload import upload_from_plan
@@ -45,16 +46,21 @@ def build_parser() -> argparse.ArgumentParser:
     list_cmd = subparsers.add_parser("list", help="List stored candidates.")
     list_cmd.add_argument("--db", type=Path, default=DEFAULT_DB_PATH)
     list_cmd.add_argument("--source", choices=["reddit", "youtube"])
-    list_cmd.add_argument("--status", choices=["needs_review", "approved", "rejected"])
+    list_cmd.add_argument("--status", choices=["needs_review", "approved", "rejected", "archived"])
     list_cmd.add_argument("--local-only", action="store_true")
     list_cmd.add_argument("--limit", type=int, default=20)
 
     approve = subparsers.add_parser("approve", help="Approve or reject a candidate and optionally attach a local file.")
     approve.add_argument("--db", type=Path, default=DEFAULT_DB_PATH)
     approve.add_argument("--candidate", type=int, required=True)
-    approve.add_argument("--status", choices=["approved", "rejected", "needs_review"], default="approved")
+    approve.add_argument("--status", choices=["approved", "rejected", "needs_review", "archived"], default="approved")
     approve.add_argument("--notes", help="Rights or review notes.")
     approve.add_argument("--file", type=Path, help="Local clip file to copy into data/assets/approved.")
+
+    archive = subparsers.add_parser("archive-plan", help="Archive the clips used in a completed plan so they are not reused.")
+    archive.add_argument("--db", type=Path, default=DEFAULT_DB_PATH)
+    archive.add_argument("--plan", type=Path, required=True)
+    archive.add_argument("--note", help="Extra note to append while archiving.")
 
     plan = subparsers.add_parser("plan", help="Create a compilation plan and FFmpeg render script.")
     plan.add_argument("--db", type=Path, default=DEFAULT_DB_PATH)
@@ -154,7 +160,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Plan: {plan['render']['plan_path']}")
         print(f"Render script: {plan['render']['render_script_path']}")
         print(f"Output video: {plan['render']['output_video_path']}")
-        print(f"Planned duration: {plan['render']['planned_total_duration_seconds']}s / 45s")
+        print(f"Planned duration: {plan['render']['planned_total_duration_seconds']}s / 180s")
         return 0
 
     if args.command == "render":
@@ -166,6 +172,18 @@ def main(argv: list[str] | None = None) -> int:
             print("Temporary downloaded clips were cleaned up after render.")
         else:
             print("Render script ready. Re-run with --execute after installing FFmpeg.")
+        return 0
+
+    if args.command == "archive-plan":
+        bootstrap_workspace()
+        initialize_database(args.db)
+        result = archive_candidates_from_plan(
+            plan_path=args.plan,
+            db_path=args.db,
+            note=args.note,
+        )
+        print(f"Archived clips from plan: {result['plan_path']}")
+        print(f"Archived candidates: {result['archived_count']}")
         return 0
 
     if args.command == "upload":

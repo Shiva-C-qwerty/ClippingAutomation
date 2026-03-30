@@ -194,3 +194,32 @@ def attach_local_media(
         """,
         (local_media_path, utc_now_iso(), candidate_id),
     )
+
+
+def archive_candidates(
+    conn: sqlite3.Connection,
+    *,
+    candidate_ids: list[int],
+    archive_note: str | None = None,
+) -> int:
+    if not candidate_ids:
+        return 0
+
+    placeholders = ", ".join("?" for _ in candidate_ids)
+    note_prefix = "Archived after compilation"
+    note_value = note_prefix if not archive_note else f"{note_prefix}: {archive_note}"
+    cursor = conn.execute(
+        f"""
+        UPDATE candidates
+        SET rights_status = 'archived',
+            rights_notes = CASE
+                WHEN rights_notes = ? THEN rights_notes
+                WHEN rights_notes LIKE ? THEN rights_notes
+                WHEN rights_notes IS NULL OR rights_notes = '' THEN ?
+                ELSE rights_notes || ' | ' || ?
+            END
+        WHERE id IN ({placeholders})
+        """,
+        [note_value, f"%{note_value}%", note_value, note_value, *candidate_ids],
+    )
+    return int(cursor.rowcount or 0)
