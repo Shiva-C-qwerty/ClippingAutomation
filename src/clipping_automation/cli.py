@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from clipping_automation.config import DEFAULT_CONFIG_PATH, DEFAULT_DB_PATH, bootstrap_workspace
@@ -18,18 +19,28 @@ def _print_candidates(rows: list[dict]) -> None:
         print("No candidates found.")
         return
 
-    header = f"{'ID':<5} {'SRC':<8} {'STATUS':<14} {'SCORE':<8} {'DUR':<6} TITLE"
+    header = f"{'ID':<5} {'SRC':<8} {'STATUS':<14} {'CAT':<10} {'FROM':<24} {'SCORE':<8} {'DUR':<6} TITLE"
     print(header)
     print("-" * len(header))
     for row in rows:
         duration = row["duration_seconds"] if row["duration_seconds"] is not None else "-"
+        metadata = {}
+        if row.get("metadata_json"):
+            try:
+                metadata = json.loads(row["metadata_json"])
+            except json.JSONDecodeError:
+                metadata = {}
+        category = metadata.get("category") or "-"
+        source_label = metadata.get("source_label") or row.get("source_context") or "-"
         print(
             f"{row['id']:<5} "
             f"{row['source_type']:<8} "
             f"{row['rights_status']:<14} "
+            f"{truncate(category, 10):<10} "
+            f"{truncate(source_label, 24):<24} "
             f"{row['score']:<8.2f} "
             f"{str(duration):<6} "
-            f"{truncate(row['title'], 80)}"
+            f"{truncate(row['title'], 60)}"
         )
 
 

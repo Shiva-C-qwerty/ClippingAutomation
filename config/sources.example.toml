@@ -24,17 +24,26 @@ user_agent = "ClippingAutomation/0.1 by replace-me"
 limit_per_feed = 15
 
 [[reddit.feeds]]
-subreddit = "funny"
+subreddit = "funnypets"
+category = "animal"
 sort = "top"
 time = "week"
 
 [[reddit.feeds]]
-subreddit = "ContagiousLaughter"
+subreddit = "FunnyAnimals"
+category = "animal"
 sort = "top"
 time = "month"
 
 [[reddit.feeds]]
-subreddit = "WatchPeopleDieInside"
+subreddit = "AnimalsBeingDerps"
+category = "animal"
+sort = "top"
+time = "month"
+
+[[reddit.feeds]]
+subreddit = "animalsdoingstuff"
+category = "animal"
 sort = "top"
 time = "month"
 

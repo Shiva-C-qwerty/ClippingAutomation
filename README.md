@@ -16,6 +16,7 @@ The current MVP intentionally does **not** auto-download clips from third-party 
 - `Reddit` discovery from subreddit JSON feeds
 - `YouTube` discovery from the official Data API
 - Local `SQLite` storage
+- Feed-level category tagging for Reddit candidates
 - Heuristic scoring for funny/short/recent clips
 - A rights review gate: `needs_review`, `approved`, `rejected`
 - Local media attachment for clips you cleared manually
@@ -50,6 +51,13 @@ That creates:
 
 Edit `config/sources.toml` and add the subreddits / queries you actually want to mine.
 
+The current sample config is focused on `animal` clips and tags these subreddits as `animal` automatically:
+
+- `r/funnypets`
+- `r/FunnyAnimals`
+- `r/AnimalsBeingDerps`
+- `r/animalsdoingstuff`
+
 YouTube discovery needs an API key:
 
 ```powershell
@@ -76,6 +84,11 @@ clipbot discover
 ```powershell
 clipbot list --status needs_review --limit 20
 ```
+
+`clipbot list` now includes:
+
+- `CAT`: the discovered or configured category, such as `animal`
+- `FROM`: the source subreddit, such as `r/funnypets`
 
 ### 3. Approve a clip and attach a local file
 
@@ -146,6 +159,7 @@ Recommended approval notes:
 ## Notes
 
 - Reddit discovery is metadata-only and best used to surface clips for manual review.
+- Reddit category tagging is currently driven by feed config and known subreddit mappings.
 - YouTube discovery is metadata-only and can be filtered to Creative Commons via config.
 - The generated FFmpeg script normalizes clips to `1080x1920`, `30fps`, and AAC audio.
 - Auto-download during render is limited to direct media URLs for approved clips and does not support generic YouTube scraping.

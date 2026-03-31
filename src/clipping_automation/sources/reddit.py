@@ -8,6 +8,12 @@ from clipping_automation.services.scoring import compute_score
 from clipping_automation.utils import utc_now_iso
 
 BASE_URL = "https://www.reddit.com"
+ANIMAL_SUBREDDITS = {
+    "funnypets",
+    "funnyanimals",
+    "animalsbeingderps",
+    "animalsdoingstuff",
+}
 
 
 def _looks_like_video(post: dict) -> bool:
@@ -22,7 +28,15 @@ def _looks_like_video(post: dict) -> bool:
     return any(domain in url for domain in ("v.redd.it", "youtube.com", "youtu.be", "redgifs.com"))
 
 
-def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
+def _infer_category(subreddit: str | None, feed_category: str | None) -> str | None:
+    if feed_category:
+        return feed_category
+    if subreddit and subreddit.lower() in ANIMAL_SUBREDDITS:
+        return "animal"
+    return None
+
+
+def _normalize_post(post: dict, *, scoring_config: dict | None, feed_category: str | None) -> dict | None:
     if not _looks_like_video(post):
         return None
 
@@ -40,6 +54,8 @@ def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
     dash_url = reddit_video.get("dash_url")
     duration_seconds = reddit_video.get("duration")
     license_hint = "Manual permission required from original creator"
+    subreddit = post.get("subreddit")
+    category = _infer_category(subreddit, feed_category)
 
     score, breakdown = compute_score(
         source_type="reddit",
@@ -61,7 +77,7 @@ def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
     return {
         "source_type": "reddit",
         "external_id": post["id"],
-        "source_context": post.get("subreddit"),
+        "source_context": subreddit,
         "title": post.get("title") or "Untitled Reddit post",
         "description": post.get("selftext") or "",
         "author": post.get("author"),
@@ -83,9 +99,11 @@ def _normalize_post(post: dict, *, scoring_config: dict | None) -> dict | None:
             "upvote_ratio": post.get("upvote_ratio"),
             "domain": post.get("domain"),
             "is_video": post.get("is_video"),
-            "subreddit": post.get("subreddit"),
+            "subreddit": subreddit,
             "url": post.get("url"),
             "dash_url": dash_url,
+            "category": category,
+            "source_label": f"r/{subreddit}" if subreddit else None,
         },
     }
 
@@ -114,6 +132,7 @@ def discover_reddit_candidates(config: dict, scoring_config: dict | None = None)
 
     for feed in feeds:
         subreddit = feed["subreddit"]
+        feed_category = feed.get("category")
         sort = feed.get("sort", "top")
         params = {"limit": limit, "raw_json": 1}
         if sort in {"top", "controversial"} and feed.get("time"):
@@ -129,7 +148,11 @@ def discover_reddit_candidates(config: dict, scoring_config: dict | None = None)
 
         for child in payload.get("data", {}).get("children", []):
             post = child.get("data", {})
-            normalized = _normalize_post(post, scoring_config=scoring_config)
+            normalized = _normalize_post(
+                post,
+                scoring_config=scoring_config,
+                feed_category=feed_category,
+            )
             if normalized:
                 all_candidates.append(normalized)
 

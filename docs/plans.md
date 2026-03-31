@@ -14,10 +14,12 @@ This file tracks what is already done, what is stable enough to build on, and wh
 
 - [x] Discover Reddit candidates from configured feeds
 - [x] Discover YouTube candidates from the YouTube Data API
+- [x] Tag animal candidates from configured animal-focused subreddits
 - [x] Score candidates using engagement, duration, freshness, keyword, vertical, and rights heuristics
 - [x] Store candidate metadata and refresh existing rows on rediscovery
 - [x] Support review states: `needs_review`, `approved`, `rejected`
 - [x] Keep approvals and notes across `discover` reruns
+- [x] Show category and source subreddit in `clipbot list`
 
 ## Phase 2: Asset Handling
 
@@ -65,6 +67,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - Current stable flow: `discover -> list -> approve -> plan -> render`
 - Current practical scope ends at exporting the final video for manual upload
 - Current post-render archive flow: `archive-plan`
+- Current sample Reddit discovery is tuned for `animal` clips from four animal-focused subreddits
 - Approved clips remain in the database across rediscovery
 - Archived clips remain in the database for traceability and are excluded from future planning because planning only uses `approved`
 - `plan` can reuse older approved clips, not just the newest discovery run
