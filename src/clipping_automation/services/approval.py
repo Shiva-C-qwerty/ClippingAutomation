@@ -4,7 +4,13 @@ import shutil
 from pathlib import Path
 
 from clipping_automation.config import APPROVED_ASSETS_DIR, DEFAULT_DB_PATH
-from clipping_automation.db import attach_local_media, connect, get_candidate, update_candidate_review
+from clipping_automation.db import (
+    attach_local_media,
+    connect,
+    get_candidate,
+    update_candidate_clip_title,
+    update_candidate_review,
+)
 from clipping_automation.utils import ensure_directory, slugify
 
 
@@ -14,6 +20,7 @@ def approve_candidate(
     rights_status: str,
     rights_notes: str | None,
     local_file: Path | None,
+    clip_title: str | None,
     db_path: Path = DEFAULT_DB_PATH,
 ) -> dict:
     ensure_directory(APPROVED_ASSETS_DIR)
@@ -39,10 +46,13 @@ def approve_candidate(
             rights_status=rights_status,
             rights_notes=rights_notes,
         )
+        if clip_title is not None:
+            update_candidate_clip_title(conn, candidate_id=candidate_id, clip_title=clip_title.strip() or None)
         conn.commit()
 
     return {
         "candidate_id": candidate_id,
         "rights_status": rights_status,
         "local_media_path": str(copied_to) if copied_to else None,
+        "clip_title": clip_title.strip() if clip_title else None,
     }

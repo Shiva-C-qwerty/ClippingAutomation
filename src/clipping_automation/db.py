@@ -196,6 +196,119 @@ def attach_local_media(
     )
 
 
+def update_candidate_music_review(
+    conn: sqlite3.Connection,
+    *,
+    candidate_id: int,
+    music_status: str,
+    music_notes: str | None = None,
+) -> None:
+    candidate = get_candidate(conn, candidate_id)
+    if candidate is None:
+        raise ValueError(f"Candidate {candidate_id} was not found.")
+
+    metadata: dict = {}
+    raw_metadata = candidate["metadata_json"]
+    if raw_metadata:
+        try:
+            metadata = json.loads(raw_metadata)
+        except json.JSONDecodeError:
+            metadata = {}
+
+    metadata["music_review"] = {
+        "status": music_status,
+        "notes": music_notes,
+        "reviewed_at": utc_now_iso(),
+    }
+
+    conn.execute(
+        """
+        UPDATE candidates
+        SET metadata_json = ?
+        WHERE id = ?
+        """,
+        (json.dumps(metadata), candidate_id),
+    )
+
+
+def update_candidate_music_detection(
+    conn: sqlite3.Connection,
+    *,
+    candidate_id: int,
+    detection: dict,
+) -> None:
+    candidate = get_candidate(conn, candidate_id)
+    if candidate is None:
+        raise ValueError(f"Candidate {candidate_id} was not found.")
+
+    metadata: dict = {}
+    raw_metadata = candidate["metadata_json"]
+    if raw_metadata:
+        try:
+            metadata = json.loads(raw_metadata)
+        except json.JSONDecodeError:
+            metadata = {}
+
+    metadata["music_detection"] = detection
+
+    conn.execute(
+        """
+        UPDATE candidates
+        SET metadata_json = ?
+        WHERE id = ?
+        """,
+        (json.dumps(metadata), candidate_id),
+    )
+
+
+def update_candidate_clip_title(
+    conn: sqlite3.Connection,
+    *,
+    candidate_id: int,
+    clip_title: str | None,
+) -> None:
+    candidate = get_candidate(conn, candidate_id)
+    if candidate is None:
+        raise ValueError(f"Candidate {candidate_id} was not found.")
+
+    metadata: dict = {}
+    raw_metadata = candidate["metadata_json"]
+    if raw_metadata:
+        try:
+            metadata = json.loads(raw_metadata)
+        except json.JSONDecodeError:
+            metadata = {}
+
+    if clip_title:
+        metadata["clip_title"] = clip_title
+    else:
+        metadata.pop("clip_title", None)
+
+    conn.execute(
+        """
+        UPDATE candidates
+        SET metadata_json = ?
+        WHERE id = ?
+        """,
+        (json.dumps(metadata), candidate_id),
+    )
+
+
+def delete_candidates_by_status(
+    conn: sqlite3.Connection,
+    *,
+    rights_status: str,
+) -> int:
+    cursor = conn.execute(
+        """
+        DELETE FROM candidates
+        WHERE rights_status = ?
+        """,
+        (rights_status,),
+    )
+    return int(cursor.rowcount or 0)
+
+
 def archive_candidates(
     conn: sqlite3.Connection,
     *,

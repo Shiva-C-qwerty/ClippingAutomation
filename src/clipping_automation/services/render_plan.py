@@ -20,6 +20,7 @@ from clipping_automation.utils import ensure_directory, ps_quote, slugify
 SHORTS_MAX_SECONDS = 180
 DEFAULT_INTRO_SECONDS = 3
 DEFAULT_OUTRO_SECONDS = 3
+WINDOWS_FONT_PATH = Path("C:/Windows/Fonts/arialbd.ttf")
 
 
 def _build_title(style: str, generated_on: str) -> str:
@@ -80,10 +81,203 @@ def _clip_block(input_path: str, output_path: str, duration: int) -> list[str]:
     ]
 
 
+def _ffmpeg_filter_path(path: Path) -> str:
+    return path.as_posix().replace(":", r"\:")
+
+
+def _clean_overlay_text(value: str | None, limit: int = 28) -> str:
+    if not value:
+        return ""
+    return " ".join(value.split())[:limit].strip()
+
+
+def _build_overlay_heading(plan: dict) -> tuple[str, str, str]:
+    clips = plan.get("clips", [])
+    categories = {
+        ((clip.get("metadata") or {}).get("category") or "").strip().lower()
+        for clip in clips
+        if (clip.get("metadata") or {}).get("category")
+    }
+    if len(categories) == 1 and "animal" in categories:
+        return ("Ranking The", "Best Animal Moments", "(BEST ONE LAST)")
+    return ("Ranking The", "Best Funny Clips", "(BEST ONE LAST)")
+
+
+def _prepare_overlay_assets(plan: dict) -> dict | None:
+    if plan.get("style") != "top5":
+        return None
+    if not WINDOWS_FONT_PATH.exists():
+        return None
+
+    build_dir = Path(plan["render"]["build_dir"])
+    overlay_dir = ensure_directory(build_dir / "overlay")
+    title_files: list[str | None] = []
+    for index, clip in enumerate(plan.get("clips", []), start=1):
+        overlay_title = _clean_overlay_text(clip.get("overlay_title"))
+        if not overlay_title:
+            title_files.append(None)
+            continue
+        title_file = overlay_dir / f"title_{index:02d}.txt"
+        title_file.write_text(overlay_title, encoding="utf-8")
+        title_files.append(str(title_file))
+
+    heading_top, heading_main, heading_sub = _build_overlay_heading(plan)
+    return {
+        "enabled": True,
+        "font_path": str(WINDOWS_FONT_PATH),
+        "title_files": title_files,
+        "heading_top": heading_top,
+        "heading_main": heading_main,
+        "heading_sub": heading_sub,
+    }
+
+
+def _build_reference_overlay_filter(plan: dict) -> str | None:
+    overlay = plan["render"].get("overlay")
+    if not overlay or not overlay.get("enabled"):
+        return None
+
+    font_path = Path(overlay["font_path"])
+    escaped_font = _ffmpeg_filter_path(font_path)
+    clips = plan.get("clips", [])
+    intro_seconds = int((plan.get("intro") or {}).get("duration_seconds", 0))
+    total_clips = len(clips)
+    rank_palette = {
+        1: "0xFFD84A",
+        2: "0xAFAFAF",
+        3: "0xFF4D4D",
+        4: "0xFF9E3D",
+        5: "0xFFFFFF",
+    }
+    rank_x = 58
+    rank_y = 360
+    rank_gap = 78
+
+    filters: list[str] = [
+        "drawtext="
+        f"fontfile='{escaped_font}':"
+        f"text='{overlay['heading_top']}':"
+        "x=(w-text_w)/2:y=26:"
+        "fontsize=42:"
+        "fontcolor=white:"
+        "borderw=3:"
+        "bordercolor=black@0.82:"
+        "shadowx=2:"
+        "shadowy=3:"
+        "shadowcolor=black@0.55",
+        "drawtext="
+        f"fontfile='{escaped_font}':"
+        f"text='{overlay['heading_main']}':"
+        "x=(w-text_w)/2:y=68:"
+        "fontsize=54:"
+        "fontcolor=0x3DFF57:"
+        "borderw=3:"
+        "bordercolor=black@0.85:"
+        "shadowx=2:"
+        "shadowy=3:"
+        "shadowcolor=black@0.55",
+        "drawtext="
+        f"fontfile='{escaped_font}':"
+        f"text='{overlay['heading_sub']}':"
+        "x=(w-text_w)/2:y=124:"
+        "fontsize=26:"
+        "fontcolor=0xFFD84A:"
+        "borderw=2:"
+        "bordercolor=black@0.82:"
+        "shadowx=2:"
+        "shadowy=2:"
+        "shadowcolor=black@0.45",
+    ]
+
+    for rank in range(1, total_clips + 1):
+        base_y = rank_y + ((rank - 1) * rank_gap)
+        rank_color = rank_palette.get(rank, "0xFFFFFF")
+        filters.append(
+            "drawtext="
+            f"fontfile='{escaped_font}':"
+            f"text='{rank}.':"
+            f"x={rank_x}:y={base_y}:"
+            "fontsize=48:"
+            f"fontcolor={rank_color}@0.68:"
+            "borderw=2:"
+            "bordercolor=black@0.55"
+        )
+
+    current_start = float(intro_seconds)
+    for index, clip in enumerate(clips, start=1):
+        clip_duration = float(clip["clip_duration_seconds"])
+        countdown_value = total_clips - index + 1
+        active_y = rank_y + ((countdown_value - 1) * rank_gap) - 4
+        flash_end = min(current_start + 0.12, current_start + clip_duration)
+        clip_end = current_start + clip_duration
+
+        filters.append(
+            "drawtext="
+            f"fontfile='{escaped_font}':"
+            f"text='{countdown_value}.':"
+            f"x={rank_x-6}:y={active_y}:"
+            "fontsize=60:"
+            f"fontcolor={rank_palette.get(countdown_value, '0xFFFFFF')}:"
+            "borderw=3:"
+            "bordercolor=black@0.75:"
+            "shadowx=3:"
+            "shadowy=3:"
+            "shadowcolor=black@0.55:"
+            f"enable='between(t,{current_start:.3f},{clip_end:.3f})'"
+        )
+
+        title_file = overlay["title_files"][index - 1] if index - 1 < len(overlay["title_files"]) else None
+        if title_file:
+            escaped_title_file = _ffmpeg_filter_path(Path(title_file))
+            filters.append(
+                "drawtext="
+                f"fontfile='{escaped_font}':"
+                f"textfile='{escaped_title_file}':"
+                "reload=0:"
+                f"x={rank_x+58}:y={active_y+8}:"
+                "fontsize=30:"
+                "fontcolor=white:"
+                "borderw=2:"
+                "bordercolor=black@0.65:"
+                "shadowx=2:"
+                "shadowy=2:"
+                "shadowcolor=black@0.45:"
+                f"enable='between(t,{current_start:.3f},{clip_end:.3f})'"
+            )
+
+        filters.append(
+            "drawbox="
+            "x=0:y=0:w=iw:h=ih:"
+            "color=white@0.10:t=fill:"
+            f"enable='between(t,{current_start:.3f},{flash_end:.3f})'"
+        )
+        filters.append(
+            "drawbox="
+            "x=0:y=166:w=iw:h=8:"
+            "color=white@0.18:t=fill:"
+            f"enable='between(t,{current_start:.3f},{flash_end:.3f})'"
+        )
+        current_start += clip_duration
+
+    filters.append(
+        "drawtext="
+        f"fontfile='{escaped_font}':"
+        "text='@clipbot demo':"
+        "x=(w-text_w)/2:y=h-38:"
+        "fontsize=24:"
+        "fontcolor=white@0.78:"
+        "borderw=2:"
+        "bordercolor=black@0.55"
+    )
+    return ",".join(filters)
+
+
 def _render_script_contents(plan: dict) -> str:
     build_dir = Path(plan["render"]["build_dir"])
     concat_file = build_dir / "concat.txt"
+    combined_output_path = build_dir / "combined.mp4"
     output_path = plan["render"]["output_video_path"]
+    overlay_filter = _build_reference_overlay_filter(plan)
     lines = [
         "$ErrorActionPreference = 'Stop'",
         "function Invoke-CheckedCommand {",
@@ -155,9 +349,18 @@ def _render_script_contents(plan: dict) -> str:
             "  \"file '$($_.Output.Replace('\\', '/'))'\"",
             "}",
             f"[System.IO.File]::WriteAllLines({ps_quote(str(concat_file))}, $concatLines, [System.Text.UTF8Encoding]::new($false))",
-            f"Invoke-CheckedCommand {{ ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -vf format=yuv420p -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -ar 48000 -b:a 192k -movflags +faststart {ps_quote(output_path)} }}",
+            f"Invoke-CheckedCommand {{ ffmpeg -y -f concat -safe 0 -i {ps_quote(str(concat_file))} -vf format=yuv420p -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -ar 48000 -b:a 192k -movflags +faststart {ps_quote(str(combined_output_path))} }}",
         ]
     )
+    if overlay_filter:
+        lines.extend(
+            [
+                f"$overlayFilter = {ps_quote(overlay_filter)}",
+                f"Invoke-CheckedCommand {{ ffmpeg -y -i {ps_quote(str(combined_output_path))} -vf $overlayFilter -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a copy -movflags +faststart {ps_quote(output_path)} }}",
+            ]
+        )
+    else:
+        lines.append(f"Copy-Item -LiteralPath {ps_quote(str(combined_output_path))} -Destination {ps_quote(output_path)} -Force")
     return "\n".join(lines) + "\n"
 
 
@@ -179,6 +382,21 @@ def _usable_rows(conn, allow_remote_media: bool, count: int) -> list[dict]:
                 item["metadata"] = {}
         else:
             item["metadata"] = {}
+        music_review = item["metadata"].get("music_review") or {}
+        detection = item["metadata"].get("music_detection") or {}
+        effective_music_status = music_review.get("status")
+        if not effective_music_status:
+            legacy_risk = music_review.get("risk")
+            if legacy_risk == "low":
+                effective_music_status = "safe"
+            elif legacy_risk == "medium":
+                effective_music_status = "needs_review"
+            elif legacy_risk == "high":
+                effective_music_status = "unsafe"
+        if not effective_music_status:
+            effective_music_status = detection.get("status") or "unknown"
+        if effective_music_status in {"unsafe", "needs_review"}:
+            continue
         if item.get("local_media_path"):
             usable.append(item)
         elif allow_remote_media and downloadable_media_url(item["source_type"], item.get("media_url")):
@@ -253,6 +471,7 @@ def create_compilation_plan(
                 "rank": index,
                 "candidate_id": row["id"],
                 "title": row["title"],
+                "overlay_title": (row.get("metadata") or {}).get("clip_title"),
                 "source_type": row["source_type"],
                 "source_url": row["source_url"],
                 "author": row["author"],
@@ -354,6 +573,7 @@ def run_render(plan_path: Path, execute: bool) -> dict:
 
     if execute:
         plan, temp_download_dir = _resolve_clip_inputs(plan)
+        plan["render"]["overlay"] = _prepare_overlay_assets(plan)
         script_path = Path(plan["render"]["render_script_path"])
         script_path.write_text(_render_script_contents(plan), encoding="utf-8")
     else:
