@@ -194,6 +194,10 @@ def _asset_duration(path: Path | None, fallback_seconds: int) -> int:
     return _ffprobe_duration(path) or fallback_seconds
 
 
+def _best_last_order(rows: list[dict]) -> list[dict]:
+    return list(reversed(rows))
+
+
 def create_compilation_plan(
     *,
     db_path: Path = DEFAULT_DB_PATH,
@@ -221,7 +225,7 @@ def create_compilation_plan(
             f"Not enough approved usable clips to build the compilation. Needed {count}, found {len(usable_rows)}."
         )
 
-    selected = usable_rows[:count]
+    selected = _best_last_order(usable_rows[:count])
     base_per_clip = max(1, available_seconds // count)
     generated_at = datetime.now(UTC).isoformat()
     output_name = slugify(name or f"{style}-{generated_at[:10]}")

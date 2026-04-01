@@ -115,6 +115,8 @@ clipbot plan --style top5 --count 5 --name funny-top-5 --intro "C:\clips\intro.m
 
 The planner keeps the whole compilation within `180s`, including intro and outro.
 
+For `top5` compilations, the current playback order is `best-last`, so the highest-scoring selected clip is placed at the end as the payoff.
+
 ### 5. Render with FFmpeg
 
 ```powershell

@@ -33,6 +33,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 
 - [x] Build a `top5` or regular compilation plan from approved clips
 - [x] Keep planned output within 180 seconds
+- [x] Order `top5` compilations as best-last
 - [x] Support local intro and outro clips
 - [x] Generate PowerShell render scripts for FFmpeg
 - [x] Normalize clips into 1080x1920 Shorts format
