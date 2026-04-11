@@ -13,6 +13,9 @@ ANIMAL_SUBREDDITS = {
     "funnyanimals",
     "animalsbeingderps",
     "animalsdoingstuff",
+    "holdmycatnip",
+    "zoomies",
+    "animalsbeingjerks",
 }
 
 

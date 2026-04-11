@@ -86,6 +86,7 @@ clipbot list --status needs_review --limit 20
 - `MUSIC`: the effective music status, such as `safe`, `needs_review`, `unsafe`, `no_audio`, or `unknown`
 - `CAT`: the discovered or configured category, such as `animal`
 - `FROM`: the source subreddit, such as `r/funnypets`
+- `LINK`: the source post/video URL shown under each row for direct review
 
 You can also shortlist by music status:
 
@@ -172,6 +173,8 @@ For `top5` renders, the final export now includes a reference-style ranking over
 - a persistent left-side ranking stack
 - the active clip title next to the current rank, using the `--clip-title` value saved at approval time
 
+The default render framing now preserves the full original clip inside the `9:16` Shorts canvas and fills the extra space with a blurred background, instead of cropping the source frame to fill the canvas.
+
 ### 7. Render with FFmpeg
 
 ```powershell
@@ -220,6 +223,7 @@ Recommended approval notes:
 - Reddit discovery is metadata-only and best used to surface clips for manual review.
 - Reddit category tagging is currently driven by feed config and known subreddit mappings.
 - YouTube discovery is metadata-only and can be filtered to Creative Commons via config.
+- `clipbot discover` now exports `data/exports/review_candidates.json`, which is a snapshot of the current `needs_review` queue rather than a generic latest-results dump.
 - The generated FFmpeg script normalizes clips to `1080x1920`, `30fps`, and AAC audio.
 - The current music-safety workflow is auto-scan plus manual review: use `clipbot scan-music` first, then use `clipbot music-review` only when you want to override or confirm a result.
 - Auto-download during render is limited to direct media URLs for approved clips and does not support generic YouTube scraping.

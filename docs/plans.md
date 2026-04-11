@@ -20,6 +20,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - [x] Support review states: `needs_review`, `approved`, `rejected`
 - [x] Keep approvals and notes across `discover` reruns
 - [x] Show category and source subreddit in `clipbot list`
+- [x] Show source links directly in `clipbot list` for faster review
 - [x] Decide that manual review should include a music-risk check before approval
 - [x] Add automatic music scanning for clips with usable media
 - [x] Store automatic music detection results in candidate metadata
@@ -45,6 +46,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - [x] Support local intro and outro clips
 - [x] Generate PowerShell render scripts for FFmpeg
 - [x] Normalize clips into 1080x1920 Shorts format
+- [x] Preserve the full source frame by default using a blurred vertical background instead of hard crop-to-fill framing
 - [x] Preserve clip audio when present
 - [x] Add silent fallback audio when a clip truly has no audio stream
 - [x] Fix concat file generation so FFmpeg can read it reliably
@@ -90,6 +92,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - Current stable flow: `discover -> scan-music -> list -> manual music review -> approve -> plan -> render`
 - Current practical scope ends at exporting the final video for manual upload
 - Current post-render archive flow: `archive-plan`
+- Current discovery snapshot for review is `data/exports/review_candidates.json`
 - Current sample Reddit discovery is tuned for `animal` clips from four animal-focused subreddits
 - Approved clips remain in the database across rediscovery
 - Archived clips remain in the database for traceability and are excluded from future planning because planning only uses `approved`

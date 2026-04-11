@@ -47,6 +47,24 @@ category = "animal"
 sort = "top"
 time = "month"
 
+[[reddit.feeds]]
+subreddit = "holdmycatnip"
+category = "animal"
+sort = "top"
+time = "month"
+
+[[reddit.feeds]]
+subreddit = "zoomies"
+category = "animal"
+sort = "top"
+time = "month"
+
+[[reddit.feeds]]
+subreddit = "AnimalsBeingJerks"
+category = "animal"
+sort = "top"
+time = "month"
+
 [youtube]
 enabled = true
 api_key_env = "YOUTUBE_API_KEY"

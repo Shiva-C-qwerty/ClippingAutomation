@@ -36,10 +36,17 @@ def run_discovery(config_path: Path, db_path: Path = DEFAULT_DB_PATH) -> dict:
             upsert_candidate(conn, candidate)
         conn.commit()
 
-        top_candidates = [dict(row) for row in fetch_candidates(conn, limit=25)]
+        review_candidates = [
+            dict(row)
+            for row in fetch_candidates(
+                conn,
+                limit=100,
+                rights_status="needs_review",
+            )
+        ]
 
-    export_path = ensure_directory(DEFAULT_EXPORT_DIR) / "latest_candidates.json"
-    export_path.write_text(json.dumps(top_candidates, indent=2), encoding="utf-8")
+    export_path = ensure_directory(DEFAULT_EXPORT_DIR) / "review_candidates.json"
+    export_path.write_text(json.dumps(review_candidates, indent=2), encoding="utf-8")
 
     return {
         "total_discovered": len(all_candidates),

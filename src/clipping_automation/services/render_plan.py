@@ -85,6 +85,31 @@ def _ffmpeg_filter_path(path: Path) -> str:
     return path.as_posix().replace(":", r"\:")
 
 
+def _build_blurred_background_filter(
+    *,
+    width: int = 1080,
+    height: int = 1920,
+    fps: int = 30,
+    inset_scale: float = 0.88,
+) -> str:
+    fg_width = int(width * inset_scale)
+    fg_height = int(height * inset_scale)
+    border_x = ((width - fg_width) // 2) - 6
+    border_y = ((height - fg_height) // 2) - 6
+    border_w = fg_width + 12
+    border_h = fg_height + 12
+
+    return (
+        f"[0:v]fps={fps},scale={width}:{height}:force_original_aspect_ratio=increase,"
+        f"crop={width}:{height},boxblur=28:10[bg];"
+        f"[0:v]fps={fps},scale={fg_width}:{fg_height}:force_original_aspect_ratio=decrease[fg];"
+        f"[bg][fg]overlay=(W-w)/2:(H-h)/2,"
+        f"drawbox=x={border_x}:y={border_y}:w={border_w}:h={border_h}:color=white@0.14:t=fill,"
+        f"drawbox=x={border_x}:y={border_y}:w={border_w}:h={border_h}:color=white@0.08:t=6,"
+        "setsar=1,format=yuv420p[vout]"
+    )
+
+
 def _clean_overlay_text(value: str | None, limit: int = 28) -> str:
     if not value:
         return ""
@@ -278,6 +303,7 @@ def _render_script_contents(plan: dict) -> str:
     combined_output_path = build_dir / "combined.mp4"
     output_path = plan["render"]["output_video_path"]
     overlay_filter = _build_reference_overlay_filter(plan)
+    clip_filter = _build_blurred_background_filter()
     lines = [
         "$ErrorActionPreference = 'Stop'",
         "function Invoke-CheckedCommand {",
@@ -339,9 +365,9 @@ def _render_script_contents(plan: dict) -> str:
             "",
             "foreach ($clip in $clips) {",
             "  if (Test-HasAudio -InputPath $clip.Input) {",
-            '    Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -t $clip.Duration -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -af "loudnorm=I=-16:LRA=11:TP=-1.5" -map 0:v:0 -map 0:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }',
+            f"    Invoke-CheckedCommand {{ ffmpeg -y -i $clip.Input -t $clip.Duration -filter_complex {ps_quote(clip_filter)} -af \"loudnorm=I=-16:LRA=11:TP=-1.5\" -map [vout] -map 0:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }}",
             "  } else {",
-            '    Invoke-CheckedCommand { ffmpeg -y -i $clip.Input -f lavfi -t $clip.Duration -i anullsrc=channel_layout=stereo:sample_rate=48000 -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,fps=30,format=yuv420p" -shortest -map 0:v:0 -map 1:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }',
+            f"    Invoke-CheckedCommand {{ ffmpeg -y -i $clip.Input -f lavfi -t $clip.Duration -i anullsrc=channel_layout=stereo:sample_rate=48000 -filter_complex {ps_quote(clip_filter)} -shortest -map [vout] -map 1:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }}",
             "  }",
             "}",
             "",

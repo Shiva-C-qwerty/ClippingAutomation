@@ -72,6 +72,7 @@ def _print_candidates(rows: list[dict]) -> None:
             f"{str(duration):<6} "
             f"{truncate(row['title'], 60)}"
         )
+        print(f"      LINK  {row.get('source_url') or '-'}")
 
 
 def build_parser() -> argparse.ArgumentParser:
