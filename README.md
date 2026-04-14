@@ -50,6 +50,33 @@ That creates:
 - `data/assets/approved/`
 - `data/exports/`
 
+## Local Web Review Prototype
+
+You can now run a local browser-based review UI on top of the same database and files:
+
+```powershell
+pip install -r requirements.txt
+pip install -e .
+clipbot-web
+```
+
+That starts a local FastAPI app on `http://127.0.0.1:8000` and opens it in your browser.
+
+The local UI includes:
+
+- `/` home dashboard
+- `/review` review queue for `needs_review`
+- `/approved` approved clips, including a ready-to-plan view
+- `/candidate/<id>` full candidate detail page
+
+The web prototype keeps using the same local storage:
+
+- database: `data/state/clips.db`
+- approved local media: `data/assets/approved`
+- plans and rendered videos: `data/exports`
+
+No cloud storage, auth, or remote deploy is included in this prototype.
+
 ## Configure Discovery Sources
 
 Edit `config/sources.toml` and add the subreddits / queries you actually want to mine.

@@ -19,7 +19,7 @@ def derive_reddit_dash_url(media_url: str | None) -> str | None:
         return None
 
     parts = [part for part in parsed.path.split("/") if part]
-    if len(parts) < 2:
+    if not parts:
         return None
 
     clip_id = parts[0]
@@ -67,6 +67,30 @@ def download_media(url: str, destination: Path, timeout: int = 60) -> Path:
     return destination
 
 
+def _is_valid_media_file(path: Path) -> bool:
+    if not path.exists() or path.stat().st_size == 0:
+        return False
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return False
+    return bool(result.stdout.strip())
+
+
 def download_reddit_media(
     *,
     media_url: str,
@@ -92,8 +116,14 @@ def download_reddit_media(
                 capture_output=True,
                 text=True,
             )
-            return destination
+            if _is_valid_media_file(destination):
+                return destination
         except (FileNotFoundError, subprocess.CalledProcessError):
             pass
 
-    return download_media(media_url, destination, timeout=timeout)
+    download_media(media_url, destination, timeout=timeout)
+    if _is_valid_media_file(destination):
+        return destination
+
+    destination.unlink(missing_ok=True)
+    raise ValueError(f"Downloaded Reddit media is not a valid playable file: {media_url}")
