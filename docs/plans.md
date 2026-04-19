@@ -16,6 +16,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - [x] Discover YouTube candidates from the YouTube Data API
 - [x] Tag animal candidates from configured animal-focused subreddits
 - [x] Score candidates using engagement, duration, freshness, keyword, vertical, and rights heuristics
+- [x] Tune scoring to prefer shorter clips, with a default sweet spot of 5 to 10 seconds
 - [x] Store candidate metadata and refresh existing rows on rediscovery
 - [x] Support review states: `needs_review`, `approved`, `rejected`
 - [x] Keep approvals and notes across `discover` reruns
@@ -58,6 +59,7 @@ This file tracks what is already done, what is stable enough to build on, and wh
 - [x] Produce a final exported video file for manual upload
 - [x] Keep plan metadata alongside the exported video for later reference
 - [x] Archive clips from a completed plan so they are not selected again by default
+- [x] Add a browser-based plan lifecycle view for listing, rendering, and archiving plans
 
 ## Phase 5: Future Upload Work
 

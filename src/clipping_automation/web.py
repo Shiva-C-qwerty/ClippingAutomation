@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import threading
 import webbrowser
+from datetime import UTC, datetime
 from pathlib import Path
-from threading import Timer
+from threading import Thread, Timer
 
 import uvicorn
 from fastapi import FastAPI, Form, HTTPException, Query, Request
@@ -25,10 +27,18 @@ from clipping_automation.db import (
     initialize_database,
 )
 from clipping_automation.services.approval import approve_candidate
+from clipping_automation.services.archive import archive_candidates_from_plan
 from clipping_automation.services.discovery import run_discovery
+from clipping_automation.services.music_detection import scan_candidates_for_music
 from clipping_automation.services.music_review import review_candidate_music
-from clipping_automation.services.render_plan import create_compilation_plan
+from clipping_automation.services.render_plan import SHORTS_MAX_SECONDS, create_compilation_plan, run_render
 from clipping_automation.web_shared import candidate_view_model
+from clipping_automation.web_plans import (
+    list_plan_paths,
+    plan_view_model,
+    resolve_plan_path,
+    update_plan_audio_beds,
+)
 
 
 APP_DIR = Path(__file__).resolve().parent
@@ -38,6 +48,9 @@ STATIC_DIR = APP_DIR / "static"
 app = FastAPI(title="Clipbot Local Review UI", version="0.1.0")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+_render_jobs: dict[str, dict] = {}
+_render_jobs_lock = threading.Lock()
 
 
 def _prepare_workspace() -> None:
@@ -97,10 +110,80 @@ def _extra_video_options() -> list[str]:
     )
 
 
+def _plan_status(plan_item: dict) -> dict:
+    filename = plan_item["filename"]
+    with _render_jobs_lock:
+        job = dict(_render_jobs.get(filename, {}))
+
+    if job.get("state") == "running":
+        return {
+            "state": "running",
+            "label": "running",
+            "started_at": job.get("started_at"),
+            "finished_at": None,
+            "last_error": "",
+        }
+    if job.get("state") == "failed":
+        return {
+            "state": "failed",
+            "label": "failed",
+            "started_at": job.get("started_at"),
+            "finished_at": job.get("finished_at"),
+            "last_error": job.get("last_error") or "",
+        }
+    if job.get("state") == "completed" or plan_item["output_exists"]:
+        return {
+            "state": "completed",
+            "label": "rendered",
+            "started_at": job.get("started_at"),
+            "finished_at": job.get("finished_at"),
+            "last_error": "",
+        }
+    return {
+        "state": "idle",
+        "label": "idle",
+        "started_at": None,
+        "finished_at": None,
+        "last_error": "",
+    }
+
+
+def _plan_item(plan_path: Path) -> dict:
+    item = plan_view_model(plan_path)
+    item["render_status"] = _plan_status(item)
+    return item
+
+
+def _render_plan_background(plan_path: Path) -> None:
+    filename = plan_path.name
+    try:
+        run_render(plan_path=plan_path, execute=True)
+    except Exception as exc:  # noqa: BLE001
+        with _render_jobs_lock:
+            _render_jobs[filename] = {
+                "state": "failed",
+                "started_at": _render_jobs.get(filename, {}).get("started_at"),
+                "finished_at": datetime.now(UTC).isoformat(),
+                "output_path": "",
+                "last_error": str(exc),
+            }
+    else:
+        output_path = _plan_item(plan_path)["output_video_path"]
+        with _render_jobs_lock:
+            _render_jobs[filename] = {
+                "state": "completed",
+                "started_at": _render_jobs.get(filename, {}).get("started_at"),
+                "finished_at": datetime.now(UTC).isoformat(),
+                "output_path": output_path,
+                "last_error": "",
+            }
+
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request) -> HTMLResponse:
     review_count = len(_fetch_view_models(status="needs_review", limit=200))
     approved = _fetch_view_models(status="approved", limit=200)
+    plans = [_plan_item(path) for path in list_plan_paths()]
     return templates.TemplateResponse(
         request=request,
         name="home.html",
@@ -109,6 +192,7 @@ def home(request: Request) -> HTMLResponse:
             "review_count": review_count,
             "approved_count": len(approved),
             "ready_count": len([row for row in approved if row["usable_for_planning"]]),
+            "plan_count": len(plans),
         },
     )
 
@@ -118,6 +202,7 @@ def review_page(
     request: Request,
     music_status: str | None = Query(default=None),
     source: str | None = Query(default=None),
+    scan_message: str | None = Query(default=None),
 ) -> HTMLResponse:
     candidates = _fetch_view_models(
         status="needs_review",
@@ -133,6 +218,7 @@ def review_page(
             "candidates": candidates,
             "music_status": music_status or "",
             "source": source or "",
+            "scan_message": scan_message or "",
         },
     )
 
@@ -163,6 +249,49 @@ def approved_page(
             "created_plan": created_plan or "",
             "plan_error": plan_error or "",
             "extra_video_options": _extra_video_options(),
+            "web_max_clip_duration": SHORTS_MAX_SECONDS,
+        },
+    )
+
+
+@app.get("/plans", response_class=HTMLResponse)
+def plans_page(
+    request: Request,
+    action_message: str | None = Query(default=None),
+) -> HTMLResponse:
+    plans = [_plan_item(path) for path in list_plan_paths()]
+    return templates.TemplateResponse(
+        request=request,
+        name="plans.html",
+        context={
+            "request": request,
+            "plans": plans,
+            "action_message": action_message or "",
+        },
+    )
+
+
+@app.get("/plans/{plan_filename}", response_class=HTMLResponse)
+def plan_detail_page(
+    request: Request,
+    plan_filename: str,
+    action_message: str | None = Query(default=None),
+) -> HTMLResponse:
+    try:
+        plan_path = resolve_plan_path(plan_filename)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    plan = _plan_item(plan_path)
+    return templates.TemplateResponse(
+        request=request,
+        name="plan_detail.html",
+        context={
+            "request": request,
+            "plan": plan,
+            "action_message": action_message or "",
         },
     )
 
@@ -184,6 +313,28 @@ def discover_action(next_url: str = Form(default="/review")) -> RedirectResponse
     _prepare_workspace()
     run_discovery(config_path=DEFAULT_CONFIG_PATH, db_path=DEFAULT_DB_PATH)
     return _redirect(next_url)
+
+
+@app.post("/actions/scan-music")
+def scan_music_action(
+    next_url: str = Form(default="/review"),
+    status: str = Form(default="needs_review"),
+    limit: int = Form(default=50),
+    download_remote: bool = Form(default=True),
+) -> RedirectResponse:
+    _prepare_workspace()
+    summary = scan_candidates_for_music(
+        db_path=DEFAULT_DB_PATH,
+        rights_status=status,
+        limit=limit,
+        allow_remote_media=download_remote,
+    )
+    message = (
+        f"Music scan complete: scanned {summary['scanned']}, "
+        f"skipped {summary['skipped']}"
+    )
+    separator = "&" if "?" in next_url else "?"
+    return _redirect(f"{next_url}{separator}scan_message={message}")
 
 
 @app.post("/actions/flush")
@@ -233,7 +384,6 @@ def plan_action(
     name: str | None = Form(default=None),
     intro_path: str | None = Form(default=None),
     outro_path: str | None = Form(default=None),
-    max_clip_duration: int = Form(default=18),
     download_approved: bool = Form(default=False),
 ) -> RedirectResponse:
     _prepare_workspace()
@@ -243,14 +393,90 @@ def plan_action(
             style=style,
             count=count,
             name=name,
-            max_clip_duration=max_clip_duration,
+            max_clip_duration=SHORTS_MAX_SECONDS,
             intro_path=Path(intro_path).expanduser() if intro_path else None,
             outro_path=Path(outro_path).expanduser() if outro_path else None,
             allow_remote_media=download_approved,
         )
     except Exception as exc:  # noqa: BLE001
         return _redirect(f"/approved?plan_error={str(exc)}")
-    return _redirect(f"/approved?created_plan={plan['render']['plan_path']}")
+    plan_filename = Path(plan["render"]["plan_path"]).name
+    return _redirect(f"/plans/{plan_filename}?action_message=Plan created")
+
+
+@app.post("/actions/plans/{plan_filename}/render")
+def plan_render_action(plan_filename: str) -> RedirectResponse:
+    _prepare_workspace()
+    try:
+        plan_path = resolve_plan_path(plan_filename)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    with _render_jobs_lock:
+        job = _render_jobs.get(plan_filename)
+        if job and job.get("state") == "running":
+            return _redirect(f"/plans/{plan_filename}?action_message=Render already running")
+        _render_jobs[plan_filename] = {
+            "state": "running",
+            "started_at": datetime.now(UTC).isoformat(),
+            "finished_at": None,
+            "output_path": "",
+            "last_error": "",
+        }
+
+    Thread(target=_render_plan_background, args=(plan_path,), daemon=True).start()
+    return _redirect(f"/plans/{plan_filename}?action_message=Render started")
+
+
+@app.post("/actions/plans/{plan_filename}/audio-beds")
+async def plan_audio_beds_action(plan_filename: str, request: Request) -> RedirectResponse:
+    _prepare_workspace()
+    try:
+        plan_path = resolve_plan_path(plan_filename)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    form = await request.form()
+    plan = _plan_item(plan_path)
+    selections: dict[int, str | None] = {}
+    for clip in plan["clips"]:
+        if not clip.get("is_no_audio"):
+            continue
+        candidate_id = int(clip["candidate_id"])
+        selections[candidate_id] = (form.get(f"audio_bed_{candidate_id}") or "").strip() or None
+
+    result = update_plan_audio_beds(plan_path, selections)
+    return _redirect(
+        f"/plans/{plan_filename}?action_message=Saved audio bed selections for {result['updated']} clip(s)"
+    )
+
+
+@app.post("/actions/plans/{plan_filename}/archive")
+def plan_archive_action(plan_filename: str) -> RedirectResponse:
+    _prepare_workspace()
+    try:
+        plan_path = resolve_plan_path(plan_filename)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    plan = _plan_item(plan_path)
+    if not plan["output_exists"]:
+        return _redirect(f"/plans/{plan_filename}?action_message=Archive blocked: render output not found")
+
+    result = archive_candidates_from_plan(
+        plan_path=plan_path,
+        db_path=DEFAULT_DB_PATH,
+        note=plan["name"],
+    )
+    return _redirect(
+        f"/plans/{plan_filename}?action_message=Archived {result['archived_count']} clip(s) from this plan"
+    )
 
 
 @app.post("/actions/candidates/{candidate_id}/music-review")

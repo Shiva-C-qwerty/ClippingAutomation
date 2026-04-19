@@ -1,0 +1,225 @@
+{
+  "generated_at": "2026-04-18T06:32:43.363256+00:00",
+  "style": "top5",
+  "name": "top-5-funny-animals-moments-21-4-2026",
+  "clips": [
+    {
+      "rank": 1,
+      "candidate_id": 696,
+      "title": "Attempted break in",
+      "overlay_title": "Bojack",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/animalsdoingstuff/comments/1s5w2o9/attempted_break_in/",
+      "author": "HappySeaweed5215",
+      "score": 51.6,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/zrhyd4lobrrg1/CMAF_480.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 1.0,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "animalsdoingstuff",
+        "url": "https://v.redd.it/zrhyd4lobrrg1",
+        "dash_url": "https://v.redd.it/zrhyd4lobrrg1/DASHPlaylist.mpd?a=1779085151%2CZmJhNTBiZTc4NGViOGViYmY2ZmQ3YWM3MzlkZDk1MzA4MjAyZWFlNjVlYzg0ZmQyZmI0MDQyMWJiM2YzMGQ5Nw%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/animalsdoingstuff",
+        "music_detection": {
+          "status": "needs_review",
+          "confidence": 0.836,
+          "has_audio": true,
+          "music_score": 0.57,
+          "speech_score": 0.15,
+          "features": {
+            "silence_ratio": 0.163,
+            "active_ratio": 0.837,
+            "spectral_centroid_hz": 1642.0,
+            "spectral_flatness": 0.41,
+            "energy_cv": 0.787,
+            "zcr_median": 0.055
+          },
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T06:19:28.158509+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T06:22:41.302065+00:00"
+        },
+        "clip_title": "Bojack"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 15,
+      "rights_notes": null
+    },
+    {
+      "rank": 2,
+      "candidate_id": 623,
+      "title": "Glad I finally replaced the battery in our garden camera",
+      "overlay_title": "Doge zoomies",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/Zoomies/comments/1s4g47u/glad_i_finally_replaced_the_battery_in_our_garden/",
+      "author": "kevio17",
+      "score": 56.34,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/vlnhfxx4qfrg1/CMAF_480.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "Zoomies",
+        "url": "https://v.redd.it/vlnhfxx4qfrg1",
+        "dash_url": "https://v.redd.it/vlnhfxx4qfrg1/DASHPlaylist.mpd?a=1779085152%2CMWE4MmFlNDkzMGEzOTc2ZDdlYzFjNzQ2ZTgwNmYzMTRhOTgwYjlkMDYzZDY2MWU0Y2RlZTY5NzMwOTk5ZmY0Yg%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/Zoomies",
+        "clip_title": "Doge zoomies"
+      },
+      "effective_music_status": "unknown",
+      "audio_bed": null,
+      "clip_duration_seconds": 8,
+      "rights_notes": null
+    },
+    {
+      "rank": 3,
+      "candidate_id": 554,
+      "title": "give him an oscar already",
+      "overlay_title": "Oscar level acting",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/funnypets/comments/1sobuls/give_him_an_oscar_already/",
+      "author": "RevolutionarySun4861",
+      "score": 66.17,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/ikvn5zlr3tvg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 1.0,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "funnypets",
+        "url": "https://v.redd.it/ikvn5zlr3tvg1",
+        "dash_url": "https://v.redd.it/ikvn5zlr3tvg1/DASHPlaylist.mpd?a=1779085149%2CMzkwOTlhYTE1ZGY2NjdlNTU0ZWQ3NWUxM2E4NGJjN2Q2MGQzM2ZmMzUzNmRjOTlhMGY4OWU2MmFhOTAxNGEwNg%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/funnypets",
+        "clip_title": "Oscar level acting"
+      },
+      "effective_music_status": "unknown",
+      "audio_bed": null,
+      "clip_duration_seconds": 13,
+      "rights_notes": null
+    },
+    {
+      "rank": 4,
+      "candidate_id": 613,
+      "title": "Some say the photographer is still there to this day.",
+      "overlay_title": "So demure",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/holdmycatnip/comments/1sne8gk/some_say_the_photographer_is_still_there_to_this/",
+      "author": "Soloflow786",
+      "score": 70.47,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/qkfpddeawlvg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "holdmycatnip",
+        "url": "https://v.redd.it/qkfpddeawlvg1",
+        "dash_url": "https://v.redd.it/qkfpddeawlvg1/DASHPlaylist.mpd?a=1779085151%2COTE2NmUzOTZlYTlmZmJhZjk0ZGZiM2E1NjJmYjk1MGQwNjlkNTk0ZGFmNmQxMGEzYTVhYmQyMDk0YWM1Zjc1Nw%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/holdmycatnip",
+        "clip_title": "So demure"
+      },
+      "effective_music_status": "unknown",
+      "audio_bed": null,
+      "clip_duration_seconds": 13,
+      "rights_notes": null
+    },
+    {
+      "rank": 5,
+      "candidate_id": 676,
+      "title": "A heroic jump",
+      "overlay_title": "So Dramatic",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/AnimalsBeingDerps/comments/1so09m7/a_heroic_jump/",
+      "author": "Doodlebug510",
+      "score": 78.48,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/geqb88vo0rvg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.98,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "AnimalsBeingDerps",
+        "url": "https://v.redd.it/geqb88vo0rvg1",
+        "dash_url": "https://v.redd.it/geqb88vo0rvg1/DASHPlaylist.mpd?a=1779085150%2CZGQ1OWVmMjlkYTY2MWQzMmYwMzdlYTNlODVjYjYwMWE2NjI5OTAzOGQyYjc1ZTM5ZGExMTIzNjBkMWFkM2I5ZA%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/AnimalsBeingDerps",
+        "music_detection": {
+          "status": "safe",
+          "confidence": 0.804,
+          "has_audio": true,
+          "music_score": 0.2,
+          "speech_score": 0.58,
+          "features": {
+            "silence_ratio": 0.61,
+            "active_ratio": 0.39,
+            "spectral_centroid_hz": 3417.8,
+            "spectral_flatness": 0.673,
+            "energy_cv": 1.401,
+            "zcr_median": 0.331
+          },
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T06:19:23.891182+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T06:21:26.241496+00:00"
+        },
+        "clip_title": "So Dramatic"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 8,
+      "rights_notes": null
+    }
+  ],
+  "intro": null,
+  "outro": {
+    "input_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\Extras\\Outro.mp4",
+    "duration_seconds": 4
+  },
+  "render": {
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30
+    },
+    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-21-4-2026_build",
+    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-21-4-2026.plan.json",
+    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-21-4-2026.render.ps1",
+    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-21-4-2026.mp4",
+    "download_remote_media": true,
+    "cleanup_downloads_after_render": true,
+    "max_total_duration_seconds": 180,
+    "planned_total_duration_seconds": 61
+  },
+  "youtube": {
+    "title": "Top 5 Funny Clips | 2026-04-18 #shorts",
+    "description": "Compilation generated with ClippingAutomation MVP.\nOnly upload this if you have the rights to reuse every clip.\n\nSources:\n1. Attempted break in - https://www.reddit.com/r/animalsdoingstuff/comments/1s5w2o9/attempted_break_in/\n2. Glad I finally replaced the battery in our garden camera - https://www.reddit.com/r/Zoomies/comments/1s4g47u/glad_i_finally_replaced_the_battery_in_our_garden/\n3. give him an oscar already - https://www.reddit.com/r/funnypets/comments/1sobuls/give_him_an_oscar_already/\n4. Some say the photographer is still there to this day. - https://www.reddit.com/r/holdmycatnip/comments/1sne8gk/some_say_the_photographer_is_still_there_to_this/\n5. A heroic jump - https://www.reddit.com/r/AnimalsBeingDerps/comments/1so09m7/a_heroic_jump/",
+    "tags": [
+      "funny",
+      "shorts",
+      "compilation",
+      "viral",
+      "clips"
+    ],
+    "privacy_status": "private",
+    "category_id": "23",
+    "made_for_kids": false
+  }
+}

@@ -28,6 +28,13 @@
         </label>
         <button type="submit" class="button">Apply</button>
       </form>
+      <form method="post" action="/actions/scan-music">
+        <input type="hidden" name="next_url" value="/review">
+        <input type="hidden" name="status" value="needs_review">
+        <input type="hidden" name="limit" value="50">
+        <input type="hidden" name="download_remote" value="true">
+        <button type="submit" class="button">Run Music Scan</button>
+      </form>
       <form method="post" action="/actions/discover">
         <input type="hidden" name="next_url" value="/review">
         <button type="submit" class="button primary">Run Discover</button>
@@ -35,6 +42,12 @@
     </div>
   </div>
 </section>
+
+{% if scan_message %}
+  <section class="panel">
+    <strong>Status:</strong> {{ scan_message }}
+  </section>
+{% endif %}
 
 {% if not candidates %}
   <section class="panel empty-state">
@@ -47,7 +60,7 @@
 <article class="panel candidate-card">
   <div class="candidate-header">
     <div>
-      <div class="eyebrow">{{ candidate.source_type }} · {{ candidate.source_label }} · {{ candidate.category }}</div>
+      <div class="eyebrow">{{ candidate.source_type }} - {{ candidate.source_label }} - {{ candidate.category }}</div>
       <h3><a href="/candidate/{{ candidate.id }}">{{ candidate.title }}</a></h3>
     </div>
     <div class="badges">
@@ -63,6 +76,13 @@
     {% if candidate.local_media_url %}
       <a href="{{ candidate.local_media_url }}" target="_blank" rel="noreferrer">Local media</a>
     {% endif %}
+  </div>
+
+  <div class="detail-grid compact">
+    <div><strong>Auto scan:</strong> {{ candidate.music_detected_status or "not scanned" }}</div>
+    <div><strong>Manual review:</strong> {{ candidate.music_notes or "-" }}</div>
+    <div><strong>Remote media:</strong> {{ "yes" if candidate.media_url else "no" }}</div>
+    <div><strong>ID:</strong> {{ candidate.id }}</div>
   </div>
 
   <form method="post" action="/actions/candidates/{{ candidate.id }}/review" class="review-form">

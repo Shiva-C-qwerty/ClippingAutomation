@@ -62,7 +62,7 @@ def compute_score(
 ) -> tuple[float, dict[str, float]]:
     scoring_config = scoring_config or {}
     minimum = int(scoring_config.get("preferred_duration_min", 5))
-    maximum = int(scoring_config.get("preferred_duration_max", 25))
+    maximum = int(scoring_config.get("preferred_duration_max", 10))
     max_age_days = int(scoring_config.get("max_candidate_age_days", 21))
     keywords = list(scoring_config.get("keywords", []))
 
@@ -83,9 +83,9 @@ def compute_score(
 
     score = (
         0.35 * engagement_score
-        + 0.20 * duration_score
+        + 0.25 * duration_score
         + 0.15 * freshness_score
-        + 0.15 * keyword_score
+        + 0.10 * keyword_score
         + 0.05 * vertical_score
         + 0.10 * rights_score
     ) * 100.0

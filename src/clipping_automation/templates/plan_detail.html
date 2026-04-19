@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Plan {{ plan.name }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="section-header">
+    <div>
+      <div class="eyebrow">{{ plan.style }} - {{ plan.clip_count }} clips</div>
+      <h2>{{ plan.name }}</h2>
+      <p>Generated at {{ plan.generated_at or "-" }}</p>
+    </div>
+    <div class="inline-actions">
+      <a href="/plans" class="button">Back to Plans</a>
+      <a href="/exports/{{ plan.plan_filename_only }}" class="button" target="_blank" rel="noreferrer">Open Plan JSON</a>
+      <a href="/exports/{{ plan.render_script_filename }}" class="button" target="_blank" rel="noreferrer">Open Render Script</a>
+      {% if plan.output_exists %}
+        <a href="/exports/{{ plan.output_filename }}" class="button primary" target="_blank" rel="noreferrer">Open Video</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if action_message %}
+  <section class="panel">
+    <strong>Status:</strong> {{ action_message }}
+  </section>
+{% endif %}
+
+<section class="panel">
+  <div class="section-header">
+    <div>
+      <h3>Render Status</h3>
+      <p>Browser-triggered renders run in the background and update here.</p>
+    </div>
+    <div class="badges">
+      <span class="badge render-{{ plan.render_status.state }}">{{ plan.render_status.label }}</span>
+    </div>
+  </div>
+  <div class="detail-grid compact">
+    <div><strong>Started</strong><span>{{ plan.render_status.started_at or "-" }}</span></div>
+    <div><strong>Finished</strong><span>{{ plan.render_status.finished_at or "-" }}</span></div>
+    <div><strong>Output status</strong><span>{{ "exists" if plan.output_exists else "missing" }}</span></div>
+    <div><strong>Output path</strong><span>{{ plan.output_video_path }}</span></div>
+  </div>
+  {% if plan.render_status.last_error %}
+    <div class="message-box error-box">
+      <strong>Last error:</strong> {{ plan.render_status.last_error }}
+    </div>
+  {% endif %}
+  <div class="inline-actions">
+    <form method="post" action="/actions/plans/{{ plan.filename }}/render">
+      <button type="submit" class="button primary" {% if plan.render_status.state == "running" %}disabled{% endif %}>Render This Plan</button>
+    </form>
+    <form method="post" action="/actions/plans/{{ plan.filename }}/archive">
+      <button type="submit" class="button" {% if not plan.output_exists %}disabled{% endif %}>Archive Plan Clips</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-header">
+    <div>
+      <h3>Plan Summary</h3>
+    </div>
+    <div class="badges">
+      {% if plan.archive.all_archived %}
+        <span class="badge archived-state">all archived</span>
+      {% else %}
+        <span class="badge">{{ plan.archive.archived_candidates }}/{{ plan.archive.total_candidates }} archived</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="detail-grid compact">
+    <div><strong>Planned total duration</strong><span>{{ plan.planned_total_duration_seconds or "-" }}s</span></div>
+    <div><strong>Intro</strong><span>{{ "yes" if plan.has_intro else "no" }}</span></div>
+    <div><strong>Outro</strong><span>{{ "yes" if plan.has_outro else "no" }}</span></div>
+    <div><strong>Clip count</strong><span>{{ plan.clip_count }}</span></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-header">
+    <div>
+      <h3>No-Audio Clip Beds</h3>
+      <p>Pick optional background beds for clips detected as <code>no_audio</code>. If left as none, the clip stays silent in this plan.</p>
+    </div>
+  </div>
+  <form method="post" action="/actions/plans/{{ plan.filename }}/audio-beds" class="review-form">
+    {% for clip in plan.clips %}
+      {% if clip.is_no_audio %}
+        <article class="clip-row">
+          <div class="clip-rank">#{{ clip.rank }}</div>
+          <div class="clip-body">
+            <strong>{{ clip.title }}</strong>
+            <div class="clip-meta">
+              <span>Candidate ID: {{ clip.candidate_id }}</span>
+              <span>Duration: {{ clip.clip_duration_seconds }}s</span>
+              <span>Music status: {{ clip.effective_music_status }}</span>
+            </div>
+            <label>
+              Audio bed for this plan
+              <select name="audio_bed_{{ clip.candidate_id }}">
+                <option value="">none / keep silent</option>
+                {% for option in plan.audio_bed_options %}
+                  <option value="{{ option.filename }}" {% if clip.selected_audio_bed_filename == option.filename %}selected{% endif %}>{{ option.display_name }} ({{ option.filename }})</option>
+                {% endfor %}
+              </select>
+            </label>
+            {% if clip.selected_audio_bed_path %}
+              <div class="clip-meta">
+                <span>Selected bed: {{ clip.selected_audio_bed_filename }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </article>
+      {% endif %}
+    {% endfor %}
+    {% if plan.no_audio_clip_count == 0 %}
+      <div class="empty-state">
+        <h3>No no-audio clips in this plan.</h3>
+        <p>This plan currently has no clips eligible for optional background beds.</p>
+      </div>
+    {% else %}
+      <div class="inline-actions">
+        <button type="submit" class="button">Save Audio Bed Choices</button>
+      </div>
+    {% endif %}
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Clips In This Plan</h3>
+  {% for clip in plan.clips %}
+    <article class="clip-row">
+      <div class="clip-rank">#{{ clip.rank }}</div>
+      <div class="clip-body">
+        <strong>{{ clip.title }}</strong>
+        <div class="clip-meta">
+          <span>Overlay title: {{ clip.overlay_title or "-" }}</span>
+          <span>Duration: {{ clip.clip_duration_seconds }}s</span>
+          <span>Candidate ID: {{ clip.candidate_id }}</span>
+          <span>Music: {{ clip.effective_music_status }}</span>
+          {% if clip.selected_audio_bed_filename %}
+            <span>Audio bed: {{ clip.selected_audio_bed_filename }}</span>
+          {% endif %}
+        </div>
+        <div class="candidate-links">
+          <a href="{{ clip.source_url }}" target="_blank" rel="noreferrer">Open source</a>
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+</section>
+{% endblock %}

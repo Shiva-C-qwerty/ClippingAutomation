@@ -120,6 +120,11 @@ input[type="text"], textarea, select {
 .music-no-audio { background: rgba(65,89,132,0.12); }
 .music-scan-failed { background: rgba(109,84,130,0.12); }
 .music-unknown { background: rgba(112,112,112,0.12); }
+.render-idle { background: rgba(112,112,112,0.12); }
+.render-running { background: rgba(65,89,132,0.12); }
+.render-completed { background: rgba(29,122,82,0.14); }
+.render-failed { background: rgba(166,54,54,0.14); }
+.archived-state { background: rgba(93, 74, 132, 0.12); }
 .review-form, .stack-form { display: grid; gap: 0.8rem; }
 .form-grid, .detail-grid, .split-panel {
   display: grid;
@@ -136,7 +141,47 @@ input[type="text"], textarea, select {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+.message-box {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.72);
+}
+.error-box {
+  border-color: rgba(166,54,54,0.25);
+  background: rgba(166,54,54,0.08);
+}
+.clip-row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid rgba(66, 45, 15, 0.08);
+}
+.clip-row:first-of-type { border-top: 0; padding-top: 0; }
+.clip-rank {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.1rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+.clip-body {
+  display: grid;
+  gap: 0.4rem;
+}
+.clip-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
 .empty-state { text-align: center; padding: 2rem 1rem; }
 @media (max-width: 768px) {
   .site-header, .hero, .section-header, .candidate-header { flex-direction: column; align-items: stretch; }
+  .clip-row { grid-template-columns: 1fr; }
+  .clip-rank { justify-content: flex-start; }
 }

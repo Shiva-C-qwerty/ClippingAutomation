@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Plans{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="section-header">
+    <div>
+      <h2>Plans</h2>
+      <p>{{ plans|length }} plan{{ '' if plans|length == 1 else 's' }} found in data/exports.</p>
+    </div>
+    <div class="inline-actions">
+      <a href="/approved" class="button">Create New Plan</a>
+    </div>
+  </div>
+</section>
+
+{% if action_message %}
+  <section class="panel">
+    <strong>Status:</strong> {{ action_message }}
+  </section>
+{% endif %}
+
+{% if not plans %}
+  <section class="panel empty-state">
+    <h3>No plans found yet.</h3>
+    <p>Create one from the Approved page and it will show up here.</p>
+  </section>
+{% endif %}
+
+{% for plan in plans %}
+<article class="panel candidate-card">
+  <div class="candidate-header">
+    <div>
+      <div class="eyebrow">{{ plan.style }} - {{ plan.clip_count }} clips - {{ plan.generated_at or "-" }}</div>
+      <h3><a href="/plans/{{ plan.filename }}">{{ plan.name }}</a></h3>
+    </div>
+    <div class="badges">
+      <span class="badge render-{{ plan.render_status.state }}">{{ plan.render_status.label }}</span>
+      {% if plan.archive.all_archived %}
+        <span class="badge archived-state">archived</span>
+      {% else %}
+        <span class="badge">{{ plan.archive.archived_candidates }}/{{ plan.archive.total_candidates }} archived</span>
+      {% endif %}
+      {% if plan.output_exists %}
+        <span class="badge ready">video ready</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="detail-grid compact">
+    <div><strong>Planned duration:</strong> {{ plan.planned_total_duration_seconds or "-" }}s</div>
+    <div><strong>Intro / Outro:</strong> {{ "yes" if plan.has_intro else "no" }} / {{ "yes" if plan.has_outro else "no" }}</div>
+    <div><strong>Plan file:</strong> <a href="/exports/{{ plan.plan_filename_only }}" target="_blank" rel="noreferrer">{{ plan.plan_filename_only }}</a></div>
+    <div><strong>Output:</strong> {% if plan.output_exists %}<a href="/exports/{{ plan.output_filename }}" target="_blank" rel="noreferrer">{{ plan.output_filename }}</a>{% else %}not rendered yet{% endif %}</div>
+  </div>
+  <div class="candidate-links">
+    <a href="/plans/{{ plan.filename }}">Open plan</a>
+    {% if plan.output_exists %}
+      <a href="/exports/{{ plan.output_filename }}" target="_blank" rel="noreferrer">Open video</a>
+    {% endif %}
+  </div>
+  <div class="inline-actions">
+    <form method="post" action="/actions/plans/{{ plan.filename }}/render">
+      <button type="submit" class="button primary" {% if plan.render_status.state == "running" %}disabled{% endif %}>Render</button>
+    </form>
+    <a href="/plans/{{ plan.filename }}" class="button">Details</a>
+  </div>
+</article>
+{% endfor %}
+{% endblock %}

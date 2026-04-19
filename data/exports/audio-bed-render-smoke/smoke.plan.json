@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-04-18T00:00:00+00:00",
+  "style": "compilation",
+  "name": "audio-bed-render-smoke",
+  "clips": [
+    {
+      "rank": 1,
+      "candidate_id": 617,
+      "title": "boop test",
+      "overlay_title": null,
+      "source_type": "reddit",
+      "source_url": "https://example.test/clip",
+      "author": null,
+      "score": 0,
+      "local_media_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\audio-bed-prototype\\clip_617_boop_source.mp4",
+      "media_url": null,
+      "metadata": {
+        "music_detection": {
+          "status": "no_audio"
+        }
+      },
+      "effective_music_status": "no_audio",
+      "audio_bed": {
+        "filename": "Sakura-Girl-Tiny-Paws-chosic.mp3",
+        "path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\assets\\audio_beds\\Sakura-Girl-Tiny-Paws-chosic.mp3"
+      },
+      "clip_duration_seconds": 5,
+      "rights_notes": null
+    }
+  ],
+  "intro": null,
+  "outro": null,
+  "render": {
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30
+    },
+    "build_dir": "data\\exports\\audio-bed-render-smoke\\build",
+    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\audio-bed-render-smoke\\smoke.plan.json",
+    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\audio-bed-render-smoke\\smoke.render.ps1",
+    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\audio-bed-render-smoke\\smoke.mp4",
+    "download_remote_media": false,
+    "cleanup_downloads_after_render": true,
+    "max_total_duration_seconds": 180,
+    "planned_total_duration_seconds": 5
+  },
+  "youtube": {
+    "title": "smoke",
+    "description": "smoke",
+    "tags": [],
+    "privacy_status": "private",
+    "category_id": "23",
+    "made_for_kids": false
+  }
+}

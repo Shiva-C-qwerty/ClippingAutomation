@@ -19,7 +19,7 @@ The current MVP intentionally does **not** auto-download clips from third-party 
 - `YouTube` discovery from the official Data API
 - Local `SQLite` storage
 - Feed-level category tagging for Reddit candidates
-- Heuristic scoring for funny/short/recent clips
+- Heuristic scoring for funny/short/recent clips, with a stronger preference for clips that are 10 seconds or shorter
 - A rights review gate: `needs_review`, `approved`, `rejected`
 - Automatic music-presence scanning for clips with usable media
 - A music-risk review step before clips should be approved for compilation
@@ -67,6 +67,7 @@ The local UI includes:
 - `/` home dashboard
 - `/review` review queue for `needs_review`
 - `/approved` approved clips, including a ready-to-plan view
+- `/plans` plan lifecycle view for existing plans, render status, and archive actions
 - `/candidate/<id>` full candidate detail page
 
 The web prototype keeps using the same local storage:
@@ -76,6 +77,12 @@ The web prototype keeps using the same local storage:
 - plans and rendered videos: `data/exports`
 
 No cloud storage, auth, or remote deploy is included in this prototype.
+
+The web UI and CLI are two interfaces over the same local workflow:
+
+- both use the same database, approved assets, plans, and exports
+- plans created in the UI are the same `.plan.json` files used by `clipbot render`
+- plans can now be listed, rendered, and archived from the browser
 
 ## Configure Discovery Sources
 
@@ -87,6 +94,8 @@ The current sample config is focused on `animal` clips and tags these subreddits
 - `r/FunnyAnimals`
 - `r/AnimalsBeingDerps`
 - `r/animalsdoingstuff`
+
+The sample scoring config now prefers clips in the `5s` to `10s` range. Longer clips can still appear, but they will score lower than equally strong short clips.
 
 YouTube discovery needs an API key:
 
@@ -182,6 +191,8 @@ That writes:
 - `data/exports/funny-top-5.plan.json`
 - `data/exports/funny-top-5.render.ps1`
 
+In the web UI, plan creation now uses full clip duration by default and only shortens clips if the overall `180s` compilation limit requires it.
+
 You can also include local intro/outro clips and let the renderer temporarily fetch approved direct-media clips:
 
 ```powershell
@@ -210,6 +221,8 @@ clipbot render --plan data/exports/funny-top-5.plan.json --execute
 
 If FFmpeg is not installed, the generated PowerShell render script is still useful as a handoff.
 
+You can also trigger render from the `/plans` page in the local web UI and monitor basic background render status there.
+
 When `--download-approved` is used, approved remote clips are downloaded into a temporary folder inside the build directory and deleted automatically after the render finishes.
 
 ### 8. Upload manually after your final checks
@@ -227,6 +240,8 @@ clipbot archive-plan --plan data/exports/funny-top-5.plan.json
 ```
 
 That marks the clips from that plan as `archived` so future planning will not reuse them by default.
+
+You can also archive a rendered plan from the `/plans` page in the local web UI after the output video exists.
 
 ## Rights Workflow
 

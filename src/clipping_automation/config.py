@@ -13,6 +13,7 @@ DATA_DIR = ROOT_DIR / "data"
 STATE_DIR = DATA_DIR / "state"
 EXPORT_DIR = DATA_DIR / "exports"
 APPROVED_ASSETS_DIR = DATA_DIR / "assets" / "approved"
+AUDIO_BEDS_DIR = DATA_DIR / "assets" / "audio_beds"
 
 DEFAULT_CONFIG_PATH = CONFIG_DIR / "sources.toml"
 EXAMPLE_CONFIG_PATH = CONFIG_DIR / "sources.example.toml"
@@ -27,6 +28,7 @@ def bootstrap_workspace() -> dict[str, Path]:
     ensure_directory(STATE_DIR)
     ensure_directory(EXPORT_DIR)
     ensure_directory(APPROVED_ASSETS_DIR)
+    ensure_directory(AUDIO_BEDS_DIR)
 
     if EXAMPLE_CONFIG_PATH.exists() and not DEFAULT_CONFIG_PATH.exists():
         shutil.copy2(EXAMPLE_CONFIG_PATH, DEFAULT_CONFIG_PATH)
@@ -36,6 +38,7 @@ def bootstrap_workspace() -> dict[str, Path]:
         "db_path": DEFAULT_DB_PATH,
         "exports_dir": EXPORT_DIR,
         "approved_assets_dir": APPROVED_ASSETS_DIR,
+        "audio_beds_dir": AUDIO_BEDS_DIR,
     }
 
 

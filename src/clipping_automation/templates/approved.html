@@ -44,6 +44,7 @@
     <div>
       <h3>Create Compilation Plan</h3>
       <p>Build a plan from approved, music-safe clips and optionally include intro/outro videos.</p>
+      <p>The web planner uses full clip duration by default and only shortens clips if the overall 180 second compilation budget requires it.</p>
     </div>
   </div>
   <form method="post" action="/actions/plan" class="review-form">
@@ -62,10 +63,6 @@
       <label>
         Name
         <input type="text" name="name" value="">
-      </label>
-      <label>
-        Max clip duration
-        <input type="text" name="max_clip_duration" value="18">
       </label>
       <label class="checkbox-label">
         <input type="checkbox" name="download_approved" value="true">
@@ -91,6 +88,7 @@
     {% endif %}
     <div class="inline-actions">
       <button type="submit" class="button primary">Create Plan</button>
+      <a href="/plans" class="button">View Plans</a>
     </div>
   </form>
 </section>
@@ -106,7 +104,7 @@
 <article class="panel candidate-card">
   <div class="candidate-header">
     <div>
-      <div class="eyebrow">{{ candidate.source_type }} · {{ candidate.source_label }} · {{ candidate.category }}</div>
+      <div class="eyebrow">{{ candidate.source_type }} - {{ candidate.source_label }} - {{ candidate.category }}</div>
       <h3><a href="/candidate/{{ candidate.id }}">{{ candidate.title }}</a></h3>
     </div>
     <div class="badges">

@@ -1,0 +1,263 @@
+{
+  "generated_at": "2026-04-18T06:11:45.925709+00:00",
+  "style": "top5",
+  "name": "top-5-funny-animals-moments-20-4-2026",
+  "clips": [
+    {
+      "rank": 1,
+      "candidate_id": 562,
+      "title": "Kitty being confused with sudden heat change",
+      "overlay_title": "Sun bathing kitty",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/FunnyAnimals/comments/1sklp61/kitty_being_confused_with_sudden_heat_change/",
+      "author": "haze4140",
+      "score": 70.88,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/90xwmnqch0vg1/CMAF_480.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "FunnyAnimals",
+        "url": "https://v.redd.it/90xwmnqch0vg1",
+        "dash_url": "https://v.redd.it/90xwmnqch0vg1/DASHPlaylist.mpd?a=1779079431%2CNTYwMDgxMDQyMDhhMTgwZDEyMTdiODQ4M2NlZTlmZTBiYzY2OGFiMjI0ODhmNTUxZDE0NWZjMWU4NDUzOTcwYg%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/FunnyAnimals",
+        "music_detection": {
+          "status": "no_audio",
+          "confidence": 1.0,
+          "has_audio": false,
+          "music_score": 0.0,
+          "speech_score": 0.0,
+          "features": {},
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T04:50:31.527975+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T06:06:50.002597+00:00"
+        },
+        "clip_title": "Sun bathing kitty"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 12,
+      "rights_notes": null
+    },
+    {
+      "rank": 2,
+      "candidate_id": 585,
+      "title": "The newest (and fluffiest) railway saboteur.",
+      "overlay_title": "Train saboteur",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/AnimalsBeingDerps/comments/1si31om/the_newest_and_fluffiest_railway_saboteur/",
+      "author": "Luigi_Spina",
+      "score": 73.85,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/i92mbfby8gug1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "AnimalsBeingDerps",
+        "url": "https://v.redd.it/i92mbfby8gug1",
+        "dash_url": "https://v.redd.it/i92mbfby8gug1/DASHPlaylist.mpd?a=1779079432%2CNTU5NjZlMTljOWQ0YTc2ZjQ5N2JjZjAyNTZkMzBkMGU5NjNmN2EzMDUyNTAyM2Q5Y2JjZjEwMTI4NjZhNzU4MQ%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/AnimalsBeingDerps",
+        "music_detection": {
+          "status": "unsafe",
+          "confidence": 0.99,
+          "has_audio": true,
+          "music_score": 0.72,
+          "speech_score": 0.1,
+          "features": {
+            "silence_ratio": 0.021,
+            "active_ratio": 0.979,
+            "spectral_centroid_hz": 3506.9,
+            "spectral_flatness": 0.689,
+            "energy_cv": 0.332,
+            "zcr_median": 0.414
+          },
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T04:50:29.521287+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T04:55:40.848416+00:00"
+        },
+        "clip_title": "Train saboteur"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 9,
+      "rights_notes": null
+    },
+    {
+      "rank": 3,
+      "candidate_id": 617,
+      "title": "boop \ud83e\udef5",
+      "overlay_title": "Must resist boop",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/holdmycatnip/comments/1sleak5/boop/",
+      "author": "SeeminglySusan",
+      "score": 76.5,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/o351id0zq6vg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.98,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "holdmycatnip",
+        "url": "https://v.redd.it/o351id0zq6vg1",
+        "dash_url": "https://v.redd.it/o351id0zq6vg1/DASHPlaylist.mpd?a=1779079433%2CM2VjNGUwNDdhZTEzZjlmMzZiNzliYWE1NDdlNmI0ZmQ4Mzc3YWU4ZWJjYjM0YjlhMWJlMjY2YWM5OWZmZjU3ZQ%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/holdmycatnip",
+        "music_detection": {
+          "status": "no_audio",
+          "confidence": 1.0,
+          "has_audio": false,
+          "music_score": 0.0,
+          "speech_score": 0.0,
+          "features": {},
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T04:50:23.168756+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T06:05:05.982239+00:00"
+        },
+        "clip_title": "Must resist boop"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 5,
+      "rights_notes": null
+    },
+    {
+      "rank": 4,
+      "candidate_id": 560,
+      "title": "Baby penguin who is molting but hasn't lost the baby feathers on its head. It looks like a little beret..\ud83d\udc27\ud83d\udc52\ud83d\ude0a",
+      "overlay_title": "Bonjour, B\u00e9b\u00e9!",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/FunnyAnimals/comments/1sm3wp2/baby_penguin_who_is_molting_but_hasnt_lost_the/",
+      "author": "[deleted]",
+      "score": 77.07,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/jpp0cuhlfcvg1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.99,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "FunnyAnimals",
+        "url": "https://v.redd.it/jpp0cuhlfcvg1",
+        "dash_url": "https://v.redd.it/jpp0cuhlfcvg1/DASHPlaylist.mpd?a=1779079431%2CODViODk3ZDBhMWQ4YWY4YWQwYWQ5OWUwOWEzM2FkN2JhMWVmMjRiNDBiOGEwODE3OWI0YzRhYTQwNzFhYjBhYQ%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/FunnyAnimals",
+        "music_detection": {
+          "status": "no_audio",
+          "confidence": 0.99,
+          "has_audio": false,
+          "music_score": 0.0,
+          "speech_score": 0.0,
+          "features": {
+            "rms_max": 9.999999974752427e-07
+          },
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T04:50:21.177068+00:00"
+        },
+        "music_review": {
+          "status": "safe",
+          "notes": null,
+          "reviewed_at": "2026-04-18T06:04:33.079280+00:00"
+        },
+        "clip_title": "Bonjour, B\u00e9b\u00e9!"
+      },
+      "effective_music_status": "safe",
+      "audio_bed": null,
+      "clip_duration_seconds": 7,
+      "rights_notes": null
+    },
+    {
+      "rank": 5,
+      "candidate_id": 616,
+      "title": "The size of the stripes will tell you what kind of a winter you'll be having.... oh, wait, that's for fuzzy wooly bear caterpillars. nvm.",
+      "overlay_title": "Absoulte unit of a cat",
+      "source_type": "reddit",
+      "source_url": "https://www.reddit.com/r/holdmycatnip/comments/1sjxsac/the_size_of_the_stripes_will_tell_you_what_kind/",
+      "author": "Soloflow786",
+      "score": 77.85,
+      "local_media_path": null,
+      "media_url": "https://v.redd.it/3d6l6uf2avug1/CMAF_720.mp4?source=fallback",
+      "metadata": {
+        "over_18": false,
+        "upvote_ratio": 0.97,
+        "domain": "v.redd.it",
+        "is_video": true,
+        "subreddit": "holdmycatnip",
+        "url": "https://v.redd.it/3d6l6uf2avug1",
+        "dash_url": "https://v.redd.it/3d6l6uf2avug1/DASHPlaylist.mpd?a=1779079433%2COTMyOTRhYjUyNmQ3YWY3OWNkYmJkMmM0YzQ0YTVkYTgxZTBlNTZlODllYmJlMTIwNDkxYTYxMDgzOGIxM2MwYw%3D%3D&v=1&f=sd",
+        "category": "animal",
+        "source_label": "r/holdmycatnip",
+        "music_detection": {
+          "status": "no_audio",
+          "confidence": 1.0,
+          "has_audio": false,
+          "music_score": 0.0,
+          "speech_score": 0.0,
+          "features": {},
+          "method": "heuristic_v1",
+          "analyzed_at": "2026-04-18T04:50:16.851246+00:00"
+        },
+        "clip_title": "Absoulte unit of a cat"
+      },
+      "effective_music_status": "no_audio",
+      "audio_bed": {
+        "filename": "Sakura-Girl-Daisy-chosic.mp3",
+        "path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\assets\\audio_beds\\Sakura-Girl-Daisy-chosic.mp3"
+      },
+      "clip_duration_seconds": 8,
+      "rights_notes": null
+    }
+  ],
+  "intro": null,
+  "outro": {
+    "input_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\Extras\\Outro.mp4",
+    "duration_seconds": 4
+  },
+  "render": {
+    "canvas": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30
+    },
+    "build_dir": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-20-4-2026_build",
+    "plan_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-20-4-2026.plan.json",
+    "render_script_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-20-4-2026.render.ps1",
+    "output_video_path": "C:\\Users\\User\\Desktop\\Personal Project\\ClippingAutomation\\data\\exports\\top-5-funny-animals-moments-20-4-2026.mp4",
+    "download_remote_media": true,
+    "cleanup_downloads_after_render": true,
+    "max_total_duration_seconds": 180,
+    "planned_total_duration_seconds": 45
+  },
+  "youtube": {
+    "title": "Top 5 Funny Clips | 2026-04-18 #shorts",
+    "description": "Compilation generated with ClippingAutomation MVP.\nOnly upload this if you have the rights to reuse every clip.\n\nSources:\n1. Kitty being confused with sudden heat change - https://www.reddit.com/r/FunnyAnimals/comments/1sklp61/kitty_being_confused_with_sudden_heat_change/\n2. The newest (and fluffiest) railway saboteur. - https://www.reddit.com/r/AnimalsBeingDerps/comments/1si31om/the_newest_and_fluffiest_railway_saboteur/\n3. boop \ud83e\udef5 - https://www.reddit.com/r/holdmycatnip/comments/1sleak5/boop/\n4. Baby penguin who is molting but hasn't lost the baby feathers on its head. It looks like a little beret..\ud83d\udc27\ud83d\udc52\ud83d\ude0a - https://www.reddit.com/r/FunnyAnimals/comments/1sm3wp2/baby_penguin_who_is_molting_but_hasnt_lost_the/\n5. The size of the stripes will tell you what kind of a winter you'll be having.... oh, wait, that's for fuzzy wooly bear caterpillars. nvm. - https://www.reddit.com/r/holdmycatnip/comments/1sjxsac/the_size_of_the_stripes_will_tell_you_what_kind/",
+    "tags": [
+      "funny",
+      "shorts",
+      "compilation",
+      "viral",
+      "clips"
+    ],
+    "privacy_status": "private",
+    "category_id": "23",
+    "made_for_kids": false
+  }
+}

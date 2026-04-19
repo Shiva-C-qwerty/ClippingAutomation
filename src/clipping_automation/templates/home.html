@@ -13,6 +13,7 @@
     </form>
     <a href="/review" class="button">Open Review Queue</a>
     <a href="/approved?ready_only=true" class="button">See Ready Clips</a>
+    <a href="/plans" class="button">Open Plans</a>
   </div>
 </section>
 
@@ -28,6 +29,10 @@
   <article class="stat-card">
     <span class="stat-label">Ready to plan</span>
     <strong>{{ ready_count }}</strong>
+  </article>
+  <article class="stat-card">
+    <span class="stat-label">Plans</span>
+    <strong>{{ plan_count }}</strong>
   </article>
 </section>
 

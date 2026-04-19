@@ -16,11 +16,13 @@ from clipping_automation.services.media import (
     download_reddit_media,
 )
 from clipping_automation.utils import ensure_directory, ps_quote, slugify
+from clipping_automation.web_plans import effective_music_status_from_metadata, resolve_audio_bed_filename
 
 SHORTS_MAX_SECONDS = 180
 DEFAULT_INTRO_SECONDS = 3
 DEFAULT_OUTRO_SECONDS = 3
 WINDOWS_FONT_PATH = Path("C:/Windows/Fonts/arialbd.ttf")
+AUDIO_BED_VOLUME = 0.18
 
 
 def _build_title(style: str, generated_on: str) -> str:
@@ -71,12 +73,18 @@ def _ffprobe_duration(path: Path) -> int | None:
         return None
 
 
-def _clip_block(input_path: str, output_path: str, duration: int) -> list[str]:
+def _clip_block(
+    input_path: str,
+    output_path: str,
+    duration: int,
+    audio_bed_path: str | None = None,
+) -> list[str]:
     return [
         "  @{",
         f"    Input = {ps_quote(input_path)}",
         f"    Output = {ps_quote(output_path)}",
         f"    Duration = {duration}",
+        f"    AudioBed = {ps_quote(audio_bed_path) if audio_bed_path else '$null'}",
         "  }",
     ]
 
@@ -335,6 +343,7 @@ def _render_script_contents(plan: dict) -> str:
                 intro["input_path"],
                 str(build_dir / f"{clip_index:02d}.mp4"),
                 int(intro["duration_seconds"]),
+                None,
             )
         )
 
@@ -345,6 +354,7 @@ def _render_script_contents(plan: dict) -> str:
                 clip["resolved_input_path"],
                 str(build_dir / f"{clip_index:02d}.mp4"),
                 int(clip["clip_duration_seconds"]),
+                clip.get("resolved_audio_bed_path"),
             )
         )
 
@@ -356,6 +366,7 @@ def _render_script_contents(plan: dict) -> str:
                 outro["input_path"],
                 str(build_dir / f"{clip_index:02d}.mp4"),
                 int(outro["duration_seconds"]),
+                None,
             )
         )
 
@@ -366,6 +377,8 @@ def _render_script_contents(plan: dict) -> str:
             "foreach ($clip in $clips) {",
             "  if (Test-HasAudio -InputPath $clip.Input) {",
             f"    Invoke-CheckedCommand {{ ffmpeg -y -i $clip.Input -t $clip.Duration -filter_complex {ps_quote(clip_filter)} -af \"loudnorm=I=-16:LRA=11:TP=-1.5\" -map [vout] -map 0:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }}",
+            "  } elseif ($clip.AudioBed) {",
+            f"    Invoke-CheckedCommand {{ ffmpeg -y -i $clip.Input -stream_loop -1 -i $clip.AudioBed -t $clip.Duration -filter_complex {ps_quote(clip_filter + f';[1:a]volume={AUDIO_BED_VOLUME}[aout]')} -map [vout] -map [aout] -shortest -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }}",
             "  } else {",
             f"    Invoke-CheckedCommand {{ ffmpeg -y -i $clip.Input -f lavfi -t $clip.Duration -i anullsrc=channel_layout=stereo:sample_rate=48000 -filter_complex {ps_quote(clip_filter)} -shortest -map [vout] -map 1:a:0 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart -c:a aac -ar 48000 -b:a 192k $clip.Output }}",
             "  }",
@@ -408,19 +421,7 @@ def _usable_rows(conn, allow_remote_media: bool, count: int) -> list[dict]:
                 item["metadata"] = {}
         else:
             item["metadata"] = {}
-        music_review = item["metadata"].get("music_review") or {}
-        detection = item["metadata"].get("music_detection") or {}
-        effective_music_status = music_review.get("status")
-        if not effective_music_status:
-            legacy_risk = music_review.get("risk")
-            if legacy_risk == "low":
-                effective_music_status = "safe"
-            elif legacy_risk == "medium":
-                effective_music_status = "needs_review"
-            elif legacy_risk == "high":
-                effective_music_status = "unsafe"
-        if not effective_music_status:
-            effective_music_status = detection.get("status") or "unknown"
+        effective_music_status = effective_music_status_from_metadata(item["metadata"])
         if effective_music_status in {"unsafe", "needs_review"}:
             continue
         if item.get("local_media_path"):
@@ -505,6 +506,8 @@ def create_compilation_plan(
                 "local_media_path": row["local_media_path"],
                 "media_url": row["media_url"],
                 "metadata": row.get("metadata", {}),
+                "effective_music_status": effective_music_status_from_metadata(row.get("metadata", {})),
+                "audio_bed": None,
                 "clip_duration_seconds": clip_duration,
                 "rights_notes": row["rights_notes"],
             }
@@ -563,28 +566,38 @@ def _resolve_clip_inputs(plan: dict) -> tuple[dict, Path | None]:
             local_media_path = clip.get("local_media_path")
             if local_media_path:
                 clip["resolved_input_path"] = str(Path(local_media_path))
-                continue
-
-            media_url = clip.get("media_url")
-            if not plan["render"].get("download_remote_media"):
-                raise ValueError(f"Clip {clip['candidate_id']} has no local file and remote downloads are disabled.")
-            if not downloadable_media_url(clip["source_type"], media_url):
-                raise ValueError(
-                    f"Clip {clip['candidate_id']} cannot be auto-downloaded safely from source type {clip['source_type']}."
-                )
-
-            if downloads_dir is None:
-                downloads_dir = create_temp_download_dir(build_dir)
-            target_path = downloads_dir / f"{clip['rank']:02d}_{slugify(clip['title'])}.mp4"
-            if clip["source_type"] == "reddit":
-                download_reddit_media(
-                    media_url=media_url,
-                    destination=target_path,
-                    dash_url=(clip.get("metadata") or {}).get("dash_url"),
-                )
             else:
-                download_media(media_url, target_path)
-            clip["resolved_input_path"] = str(target_path)
+                media_url = clip.get("media_url")
+                if not plan["render"].get("download_remote_media"):
+                    raise ValueError(f"Clip {clip['candidate_id']} has no local file and remote downloads are disabled.")
+                if not downloadable_media_url(clip["source_type"], media_url):
+                    raise ValueError(
+                        f"Clip {clip['candidate_id']} cannot be auto-downloaded safely from source type {clip['source_type']}."
+                    )
+
+                if downloads_dir is None:
+                    downloads_dir = create_temp_download_dir(build_dir)
+                target_path = downloads_dir / f"{clip['rank']:02d}_{slugify(clip['title'])}.mp4"
+                if clip["source_type"] == "reddit":
+                    download_reddit_media(
+                        media_url=media_url,
+                        destination=target_path,
+                        dash_url=(clip.get("metadata") or {}).get("dash_url"),
+                    )
+                else:
+                    download_media(media_url, target_path)
+                clip["resolved_input_path"] = str(target_path)
+
+            clip["resolved_audio_bed_path"] = None
+            effective_music_status = clip.get("effective_music_status") or effective_music_status_from_metadata(
+                clip.get("metadata")
+            )
+            if effective_music_status == "no_audio":
+                audio_bed = clip.get("audio_bed") or {}
+                selected_filename = audio_bed.get("filename")
+                if selected_filename:
+                    audio_bed_path = resolve_audio_bed_filename(selected_filename)
+                    clip["resolved_audio_bed_path"] = str(audio_bed_path)
     except Exception:
         cleanup_temp_dir(downloads_dir)
         raise
